@@ -1,3 +1,0 @@
-C:/Users/wojte/Documents/LibrarySystem/build/CMakeFiles/LibrarySystem.dir
-C:/Users/wojte/Documents/LibrarySystem/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/wojte/Documents/LibrarySystem/build/CMakeFiles/ZERO_CHECK.dir

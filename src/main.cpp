@@ -7,7 +7,7 @@
 int main(){
     Book book{1, "Hobbit", "Tolkien", 1937, "Allen & Unwin"};
     User user{1,"Jan","Kowalski"};
-    std::cout << "is book borrowed: "<< book.getIsBorrowed() << std::endl;
+    std::cout << "is book borrowed: "<< book.isBorrowed() << std::endl;
     return 1;
 
 }

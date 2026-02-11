@@ -47,6 +47,9 @@ public:
     void setEmail(std::string name) {email = name;}
 
     int getId() const { return id; }
+    
+    const std::string& getFirstName() const { return first_name; }
+    const std::string& getLastName() const { return last_name; }
 
 private:
 

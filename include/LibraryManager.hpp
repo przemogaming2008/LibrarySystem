@@ -20,6 +20,8 @@ public:
     bool getBookStatus(int bookId) const;
     std::vector<Book> findBooksByTitle(const std::string& fragment) const;
 
+    void listBooks() const;
+    void listUsers() const;
 
 private:
 

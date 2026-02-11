@@ -1,4 +1,5 @@
 #include "LibraryManager.hpp"
+#include <iostream>
 
 bool LibraryManager::addBook(const Book& book) {
     // unique ID
@@ -73,4 +74,48 @@ std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) 
         }
     }
     return result;
+}
+
+void LibraryManager::listUsers() const {
+    if (users.empty()) {
+        std::cout << "Brak użytkowników.\n";
+        return;
+    }
+
+    std::cout << "Lista użytkowników:\n";
+    for (const auto& u : users) {
+        std::cout << u.getId() << ". "
+                  << u.getFirstName() << " "
+                  << u.getLastName();
+        
+
+        if (!u.getDepartment().empty())
+            std::cout << " (Dział: " << u.getDepartment() << ")";
+        std::cout << "\n";
+    }
+    std::cout << '\n';
+}
+
+void LibraryManager::listBooks() const {
+    if (books.empty()) {
+        std::cout << "Brak książek w bibliotece.\n";
+        return;
+    }
+
+    std::cout << "ID | Tytuł | Autor | Status\n";
+    std::cout << "---------------------------------------------------------------\n";
+
+    for (const auto& b : books) {
+        std::cout << b.getId() << " | "
+                  << b.getTitle() << " | "
+                  << b.getAuthor() << " | ";
+
+        if (!b.isBorrowed()) {
+            std::cout << "dostępna";
+        } else {
+            std::cout << "wypożyczona (ID " << b.getBorrowerId() << ")";
+        }
+        std::cout << "\n";
+    }
+    std::cout << '\n';
 }

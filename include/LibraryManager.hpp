@@ -11,8 +11,8 @@
 
 class LibraryManager{
 public:
-    bool addBook(const Book& book);
-    bool addUser(const User& user);
+    int addBook(std::string title, std::string author, int year, std::string publisher);
+    int addUser(std::string first, std::string last, std::string department);
 
     bool borrowBook(int bookId, int userId);
     bool returnBook(int bookId);
@@ -28,4 +28,6 @@ private:
     std::vector<Book> books;
     std::vector<User> users;
 
+    int nextBookId = 1;
+    int nextUserId = 1;
 };

@@ -58,35 +58,27 @@ void MenuUI::printUsersTableHeader() {
 
 void MenuUI::handleAddBook() {
     std::cout << "\n=== Dodaj nowa ksiazke ===\n";
-    int id = readInt("Podaj ID: ");
+
     std::string title = readLine("Podaj tytul: ");
     std::string author = readLine("Podaj autora: ");
     int year = readInt("Podaj rok: ");
     std::string publisher = readLine("Podaj wydawnictwo: ");
 
-    Book book{id, title, author, year, publisher};
-    if (manager.addBook(book)) {
-        std::cout << "OK: Dodano ksiazke.\n";
-    } else {
-        std::cout << "BLAD: Ksiazka o takim ID juz istnieje.\n";
-    }
+    int id = manager.addBook(title, author, year, publisher);
+
+    std::cout << "Ksiazka dodana pomyslnie z ID = " << id << "\n";
 }
 
 void MenuUI::handleAddUser() {
     std::cout << "\n=== Dodaj nowego czytelnika ===\n";
-    int id = readInt("Podaj ID: ");
+
     std::string first = readLine("Podaj imie: ");
     std::string last = readLine("Podaj nazwisko: ");
     std::string dept = readLine("Podaj dzial (opcjonalnie): ");
 
-    User user{id, first, last};
-    if (!dept.empty()) user.setDepartment(dept);
+    int id = manager.addUser(first, last, dept);
 
-    if (manager.addUser(user)) {
-        std::cout << "OK: Dodano czytelnika.\n";
-    } else {
-        std::cout << "BLAD: Czytelnik o takim ID juz istnieje.\n";
-    }
+    std::cout << "Uzytkownik dodany, ID = " << id << "\n";
 }
 
 void MenuUI::handleListBooks() {

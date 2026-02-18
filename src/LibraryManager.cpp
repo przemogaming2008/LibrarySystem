@@ -1,25 +1,18 @@
 #include "LibraryManager.hpp"
 #include <iostream>
 
-bool LibraryManager::addBook(const Book& book) {
-    // unique ID
-    for (const auto& b : books) {
-        if (b.getId() == book.getId()) {
-            return false;
-        }
-    }
-    books.push_back(book);
-    return true;
+int LibraryManager::addBook(std::string title, std::string author, int year, std::string publisher) {
+    int id = nextBookId++;
+    books.emplace_back(id, std::move(title), std::move(author), year, std::move(publisher));
+    return id;
 }
 
-bool LibraryManager::addUser(const User& user) {
-    for (const auto& u : users) {
-        if (u.getId() == user.getId()) {
-            return false;
-        }
-    }
-    users.push_back(user);
-    return true;
+int LibraryManager::addUser(std::string first, std::string last, std::string department) {
+    int id = nextUserId++;
+    User u{id, std::move(first), std::move(last)};
+    if (!department.empty()) u.setDepartment(std::move(department));
+    users.push_back(std::move(u));
+    return id;
 }
 bool LibraryManager::borrowBook(int bookId, int userId) {
     //if user exist?

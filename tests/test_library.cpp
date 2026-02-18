@@ -5,39 +5,38 @@
 void test_add_book() {
     LibraryManager m;
 
-    Book b1{1,"Hobbit","Tolkien",1937,"AU"};
-    Book b2{1,"Hobbit2","Tolkien",1938,"AU"};
+    int id1 = m.addBook("Hobbit","Tolkien",1937,"AU");
+    int id2 = m.addBook("Hobbit2","Tolkien",1938,"AU");
 
-    assert(m.addBook(b1) == true);
-    assert(m.addBook(b2) == false);
+    assert(id1 == 1);
+    assert(id2 == 2);
 
     std::cout << "test_add_book OK\n";
 }
+
 void test_add_user() {
     LibraryManager m;
 
-    User u1{1,"Jan","Kowalski"};
-    User u2{1,"Anna","Nowak"};
+    int u1 = m.addUser("Jan","Kowalski","IT");
+    int u2 = m.addUser("Anna","Nowak","HR");
 
-    assert(m.addUser(u1) == true);
-    assert(m.addUser(u2) == false);
+    assert(u1 == 1);
+    assert(u2 == 2);
 
     std::cout << "test_add_user OK\n";
 }
+
 void test_borrow_return() {
     LibraryManager m;
 
-    Book b{1,"Hobbit","Tolkien",1937,"AU"};
-    User u{1,"Jan","Kowalski"};
+    int bookId = m.addBook("Hobbit","Tolkien",1937,"AU");
+    int userId = m.addUser("Jan","Kowalski","IT");
 
-    m.addBook(b);
-    m.addUser(u);
+    assert(m.borrowBook(bookId, userId) == true);
+    assert(m.borrowBook(bookId, userId) == false);
 
-    assert(m.borrowBook(1,1) == true);
-    assert(m.borrowBook(1,1) == false);//już wypożyczona
-
-    assert(m.returnBook(1) == true);
-    assert(m.returnBook(1) == false);//już oddana
+    assert(m.returnBook(bookId) == true);
+    assert(m.returnBook(bookId) == false);
 
     std::cout << "test_borrow_return OK\n";
 }
@@ -48,4 +47,5 @@ int main() {
     test_borrow_return();
 
     std::cout << "\nALL TESTS PASSED\n";
+    return 0;
 }

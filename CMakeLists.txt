@@ -14,3 +14,15 @@ add_executable(LibrarySystem
 target_include_directories(LibrarySystem PRIVATE
     ${CMAKE_SOURCE_DIR}/include
 )
+
+add_executable(LibrarySystemTests
+    tests/test_library.cpp
+    src/LibraryManager.cpp
+    src/DataStorage.cpp
+)
+target_include_directories(LibrarySystemTests PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+enable_testing()
+add_test(NAME LibrarySystemTests COMMAND LibrarySystemTests)

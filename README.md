@@ -6,3 +6,6 @@ cmake -S . -B build
 cmake --build build
 ### Run
 build\Debug\LibrarySystem.exe
+
+### Run tests
+build\Debug\LibrarySystemTests.exe

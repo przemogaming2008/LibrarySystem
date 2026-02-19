@@ -23,6 +23,8 @@ public:
     void listBooks() const;
     void listUsers() const;
 
+    bool bookExists(int bookId) const;
+    
 private:
 
     std::vector<Book> books;

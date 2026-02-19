@@ -130,3 +130,12 @@ void LibraryManager::listBooks() const {
     }
     std::cout << '\n';
 }
+
+bool LibraryManager::bookExists(int bookId) const {
+    for (const auto& b : books) {
+        if (b.getId() == bookId) {
+            return true;
+        }
+    }
+    return false;
+}

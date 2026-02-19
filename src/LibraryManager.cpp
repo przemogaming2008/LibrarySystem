@@ -1,25 +1,30 @@
 #include "LibraryManager.hpp"
 #include <iostream>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
-bool LibraryManager::addBook(const Book& book) {
-    // unique ID
-    for (const auto& b : books) {
-        if (b.getId() == book.getId()) {
-            return false;
-        }
-    }
-    books.push_back(book);
-    return true;
+static std::string getCurrentDate() {
+    std::time_t t = std::time(nullptr);
+    std::tm tm = *std::localtime(&t);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%d");
+    return oss.str();
 }
 
-bool LibraryManager::addUser(const User& user) {
-    for (const auto& u : users) {
-        if (u.getId() == user.getId()) {
-            return false;
-        }
-    }
-    users.push_back(user);
-    return true;
+int LibraryManager::addBook(std::string title, std::string author, int year, std::string publisher) {
+    int id = nextBookId++;
+    books.emplace_back(id, std::move(title), std::move(author), year, std::move(publisher));
+    return id;
+}
+
+int LibraryManager::addUser(std::string first, std::string last, std::string department) {
+    int id = nextUserId++;
+    User u{id, std::move(first), std::move(last)};
+    if (!department.empty()) u.setDepartment(std::move(department));
+    users.push_back(std::move(u));
+    return id;
 }
 bool LibraryManager::borrowBook(int bookId, int userId) {
     //if user exist?
@@ -37,6 +42,7 @@ bool LibraryManager::borrowBook(int bookId, int userId) {
         if (b.getId() == bookId) {
             if (b.isBorrowed()) return false;
             b.borrow(userId);
+            b.setBorrowDate(getCurrentDate());
             return true;
         }
     }
@@ -50,6 +56,7 @@ bool LibraryManager::returnBook(int bookId) {
         if (b.getId() == bookId) {
             if (!b.isBorrowed()) return false;
             b.giveBack();
+            b.setBorrowDate("");
             return true;
         }
     }
@@ -113,7 +120,11 @@ void LibraryManager::listBooks() const {
         if (!b.isBorrowed()) {
             std::cout << "dostępna";
         } else {
-            std::cout << "wypożyczona (ID " << b.getBorrowerId() << ")";
+            std::cout << "wypozyczona (ID " 
+                        << b.getBorrowerId() 
+                        << ", od " 
+                        << b.getBorrowDate() 
+                        << ")";
         }
         std::cout << "\n";
     }

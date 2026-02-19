@@ -22,6 +22,8 @@ public:
     void borrow(int userId) { borrowerId = userId; }
     void giveBack() { borrowerId = -1; }
 
+    const std::string& getBorrowDate() const { return borrowDate; }
+    void setBorrowDate(std::string date) { borrowDate = std::move(date); }
 private:
 
     const int id;
@@ -30,7 +32,8 @@ private:
     const int year;
     const std::string publisher;
     
-    int borrowerId; // -1 = free 
+    int borrowerId; // -1 = free
+    std::string borrowDate;
     
 };
 

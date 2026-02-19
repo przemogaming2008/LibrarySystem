@@ -15,8 +15,10 @@ void MenuUI::printMenu() const {
         << "4. Wyswietl liste czytelnikow\n"
         << "5. Wypozycz ksiazke\n"
         << "6. Zwroc ksiazke\n"
+        << "7. Sprawdz status ksiazki\n"
+        << "8. Wyszukaj ksiazki po tytule\n"
         << "9. Wyjscie\n"
-        << "Wybierz opcje [1-6,9]: ";
+        << "Wybierz opcje [1-9]: ";
 }
 
 
@@ -117,6 +119,38 @@ void MenuUI::handleReturnBook() {
     std::cout << '\n';
 }
 
+void MenuUI::handleSearchByTitle() {
+    std::cout << "\n=== WYSZUKAJ KSIAZKI ===\n";
+    std::string fragment = readLine("Podaj fragment tytulu: ");
+
+    auto results = manager.findBooksByTitle(fragment);
+
+    if (results.empty()) {
+        std::cout << "Brak wyników.\n\n";
+        return;
+    }
+
+    std::cout << "Znalezione ksiazki:\n";
+    for (const auto& b : results) {
+        std::cout << b.getId() << ". "
+                  << b.getTitle() << " - "
+                  << b.getAuthor() << "\n";
+    }
+    std::cout << "\n";
+}
+void MenuUI::handleCheckStatus() {
+    std::cout << "\n=== STATUS KSIAZKI ===\n";
+    int id = readInt("Podaj ID ksiazki: ");
+
+    bool borrowed = manager.getBookStatus(id);
+
+    if (!borrowed) {
+        std::cout << "Ksiazka jest dostepna lub nie istnieje.\n\n";
+    } else {
+        std::cout << "Ksiazka jest wypozyczona.\n\n";
+    }
+}
+
 void MenuUI::mainMenu() {
     while (true) {
         printHeader();
@@ -138,6 +172,8 @@ void MenuUI::mainMenu() {
             case 4: handleListUsers(); break;
             case 5: handleBorrowBook(); break;
             case 6: handleReturnBook(); break;
+            case 7: handleCheckStatus(); break;
+            case 8: handleSearchByTitle(); break;
             case 9: std::cout << "Koniec.\n"; return;
             default: std::cout << "Nie ma takiej opcji.\n"; break;
         }

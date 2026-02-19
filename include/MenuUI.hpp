@@ -17,6 +17,9 @@ private:
     void handleListUsers();
     void handleBorrowBook();
     void handleReturnBook();
+    void handleCheckStatus();
+    void handleSearchByTitle();
+
 
     // helpers UI
     void printHeader() const;

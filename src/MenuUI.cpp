@@ -142,10 +142,13 @@ void MenuUI::handleCheckStatus() {
     std::cout << "\n=== STATUS KSIAZKI ===\n";
     int id = readInt("Podaj ID ksiazki: ");
 
-    bool borrowed = manager.getBookStatus(id);
+    if (!manager.bookExists(id)) {
+        std::cout << "BLAD: Nie istnieje ksiazka o ID " << id << ".\n\n";
+        return;
+    }
 
-    if (!borrowed) {
-        std::cout << "Ksiazka jest dostepna lub nie istnieje.\n\n";
+    if (!manager.getBookStatus(id)) {
+        std::cout << "Ksiazka jest dostepna.\n\n";
     } else {
         std::cout << "Ksiazka jest wypozyczona.\n\n";
     }

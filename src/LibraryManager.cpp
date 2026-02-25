@@ -139,3 +139,18 @@ bool LibraryManager::bookExists(int bookId) const {
     }
     return false;
 }
+bool LibraryManager::addBookFromStorage(const Book& book) {
+    for (const auto& b : books) {
+        if (b.getId() == book.getId()) return false;
+    }
+    books.push_back(book);
+    return true;
+}
+
+bool LibraryManager::addUserFromStorage(const User& user) {
+    for (const auto& u : users) {
+        if (u.getId() == user.getId()) return false;
+    }
+    users.push_back(user);
+    return true;
+}

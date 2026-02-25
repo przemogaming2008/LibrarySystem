@@ -25,6 +25,15 @@ public:
 
     bool bookExists(int bookId) const;
     
+    const std::vector<Book>& getBooks() const { return books; }
+    const std::vector<User>& getUsers() const { return users; }
+
+    bool addBookFromStorage(const Book& book);
+    bool addUserFromStorage(const User& user);
+
+    void setNextBookId(int v) { nextBookId = v; }
+    void setNextUserId(int v) { nextUserId = v; }
+    
 private:
 
     std::vector<Book> books;

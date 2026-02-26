@@ -4,6 +4,7 @@
 #include "Models.hpp"
 #include <iostream>
 #include "DataStorage.hpp"
+#include <clocale>
 
 int main(){
     std::setlocale(LC_ALL, "pl_PL.UTF-8");

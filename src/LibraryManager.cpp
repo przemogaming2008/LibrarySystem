@@ -120,7 +120,7 @@ void LibraryManager::listBooks() const {
         if (!b.isBorrowed()) {
             std::cout << "dostępna";
         } else {
-            std::cout << "wypozyczona (ID " 
+            std::cout << "wypożyczona (ID " 
                         << b.getBorrowerId() 
                         << ", od " 
                         << b.getBorrowDate() 

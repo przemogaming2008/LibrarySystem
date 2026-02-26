@@ -9,16 +9,16 @@ void MenuUI::printHeader() const {
 
 void MenuUI::printMenu() const {
     std::cout
-        << "1. Dodaj nowa ksiazke\n"
+        << "1. Dodaj nową książkę\n"
         << "2. Dodaj nowego czytelnika\n"
-        << "3. Wyswietl liste ksiazek\n"
-        << "4. Wyswietl liste czytelnikow\n"
-        << "5. Wypozycz ksiazke\n"
-        << "6. Zwroc ksiazke\n"
-        << "7. Sprawdz status ksiazki\n"
-        << "8. Wyszukaj ksiazki po tytule\n"
-        << "9. Wyjscie\n"
-        << "Wybierz opcje [1-9]: ";
+        << "3. Wyświetl listę książek\n"
+        << "4. Wyświetl listę czytelników\n"
+        << "5. Wypożycz książkę\n"
+        << "6. Zwróć książkę\n"
+        << "7. Sprawdź status książki\n"
+        << "8. Wyszukaj książki po tytule\n"
+        << "9. Wyjście\n"
+        << "Wybierz opcję [1-9]: ";
 }
 
 
@@ -34,7 +34,7 @@ int MenuUI::readInt(const char* prompt) {
         
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Niepoprawna liczba. Sprobuj ponownie.\n";
+        std::cout << "Niepoprawna liczba. Spróbuj ponownie.\n";
     }
 }
 
@@ -47,7 +47,7 @@ std::string MenuUI::readLine(const char* prompt) {
 
 void MenuUI::printBooksTableHeader() {
     std::cout << "ID  | "
-              << std::left << std::setw(25) << "Tytul" << " | "
+              << std::left << std::setw(25) << "Tytuł" << " | "
               << std::left << std::setw(20) << "Autor" << " | "
               << "Status\n";
     std::cout << "-----------------------------------------------------------------\n";
@@ -55,73 +55,73 @@ void MenuUI::printBooksTableHeader() {
 
 void MenuUI::printUsersTableHeader() {
     std::cout << "ID  | "
-              << std::left << std::setw(20) << "Imie i nazwisko" << " | "
-              << "Dzial\n";
+              << std::left << std::setw(20) << "Imię i nazwisko" << " | "
+              << "Dział\n";
     std::cout << "-----------------------------------------------------------------\n";
 }
 
 void MenuUI::handleAddBook() {
-    std::cout << "\n=== Dodaj nowa ksiazke ===\n";
+    std::cout << "\n=== Dodaj nowa książkę ===\n";
 
-    std::string title = readLine("Podaj tytul: ");
+    std::string title = readLine("Podaj tytuł: ");
     std::string author = readLine("Podaj autora: ");
     int year = readInt("Podaj rok: ");
     std::string publisher = readLine("Podaj wydawnictwo: ");
 
     int id = manager.addBook(title, author, year, publisher);
 
-    std::cout << "Ksiazka dodana pomyslnie z ID = " << id << "\n";
+    std::cout << "Książka dodana pomyślnie z ID = " << id << "\n";
 }
 
 void MenuUI::handleAddUser() {
     std::cout << "\n=== Dodaj nowego czytelnika ===\n";
 
-    std::string first = readLine("Podaj imie: ");
+    std::string first = readLine("Podaj imię: ");
     std::string last = readLine("Podaj nazwisko: ");
-    std::string dept = readLine("Podaj dzial (opcjonalnie): ");
+    std::string dept = readLine("Podaj dział (opcjonalnie): ");
 
     int id = manager.addUser(first, last, dept);
 
-    std::cout << "Uzytkownik dodany, ID = " << id << "\n";
+    std::cout << "Użytkownik dodany, ID = " << id << "\n";
 }
 
 void MenuUI::handleListBooks() {
-    std::cout << "\n=== LISTA KSIAZEK ===\n";
+    std::cout << "\n=== LISTA KSIĄŻEK ===\n";
     manager.listBooks();
 }
 
 void MenuUI::handleListUsers() {
-    std::cout << "\n=== LISTA CZYTELNIKOW ===\n";
+    std::cout << "\n=== LISTA CZYTELNIKÓW ===\n";
     manager.listUsers();
 }
 void MenuUI::handleBorrowBook() {
-    std::cout << "\n=== WYPOZYCZ KSIAZKE ===\n";
-    int bookId = readInt("Podaj ID ksiazki: ");
+    std::cout << "\n=== WYPOŻYCZ KSIĄŻKĘ ===\n";
+    int bookId = readInt("Podaj ID książki: ");
     int userId = readInt("Podaj ID czytelnika: ");
 
     if (manager.borrowBook(bookId, userId)) {
-        std::cout << "Wypozyczono ksiazke.\n";
+        std::cout << "Wypożyczono książkę.\n";
     } else {
-        std::cout << "Nie udalo sie wypozyczyc (sprawdz ID / status).\n";
+        std::cout << "Nie udało sie wypożyczyć (sprawdz ID / status).\n";
     }
     std::cout << '\n';
 }
 
 void MenuUI::handleReturnBook() {
-    std::cout << "\n=== ZWROC KSIAZKE ===\n";
-    int bookId = readInt("Podaj ID ksiazki: ");
+    std::cout << "\n=== ZWRÓĆ KSIĄŻKĘ ===\n";
+    int bookId = readInt("Podaj ID książki: ");
 
     if (manager.returnBook(bookId)) {
-        std::cout << "Zwrocono ksiazke.\n";
+        std::cout << "Zwrócono książkę.\n";
     } else {
-        std::cout << "Nie udalo sie zwrocic (sprawdz ID / czy byla wypozyczona).\n";
+        std::cout << "Nie udało sie zwrócić (sprawdz ID / czy byla wypożyczona).\n";
     }
     std::cout << '\n';
 }
 
 void MenuUI::handleSearchByTitle() {
-    std::cout << "\n=== WYSZUKAJ KSIAZKI ===\n";
-    std::string fragment = readLine("Podaj fragment tytulu: ");
+    std::cout << "\n=== WYSZUKAJ KSIĄŻKI ===\n";
+    std::string fragment = readLine("Podaj fragment tytułu: ");
 
     auto results = manager.findBooksByTitle(fragment);
 
@@ -130,7 +130,7 @@ void MenuUI::handleSearchByTitle() {
         return;
     }
 
-    std::cout << "Znalezione ksiazki:\n";
+    std::cout << "Znalezione książki:\n";
     for (const auto& b : results) {
         std::cout << b.getId() << ". "
                   << b.getTitle() << " - "
@@ -139,18 +139,18 @@ void MenuUI::handleSearchByTitle() {
     std::cout << "\n";
 }
 void MenuUI::handleCheckStatus() {
-    std::cout << "\n=== STATUS KSIAZKI ===\n";
-    int id = readInt("Podaj ID ksiazki: ");
+    std::cout << "\n=== STATUS KSIĄŻKI ===\n";
+    int id = readInt("Podaj ID książki: ");
 
     if (!manager.bookExists(id)) {
-        std::cout << "BLAD: Nie istnieje ksiazka o ID " << id << ".\n\n";
+        std::cout << "BŁĄD: Nie istnieje książka o ID " << id << ".\n\n";
         return;
     }
 
     if (!manager.getBookStatus(id)) {
-        std::cout << "Ksiazka jest dostepna.\n\n";
+        std::cout << "Książka jest dostępna.\n\n";
     } else {
-        std::cout << "Ksiazka jest wypozyczona.\n\n";
+        std::cout << "Książka jest wypożyczona.\n\n";
     }
 }
 
@@ -163,7 +163,7 @@ void MenuUI::mainMenu() {
         if (!(std::cin >> choice)) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Niepoprawny wybor.\n";
+            std::cout << "Niepoprawny wybór.\n";
             continue;
         }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');

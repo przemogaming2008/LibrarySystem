@@ -3,6 +3,7 @@
 #include "MenuUI.hpp"
 #include "Models.hpp"
 #include <iostream>
+#include "DataStorage.hpp"
 
 int main(){
     std::setlocale(LC_ALL, "pl_PL.UTF-8");
@@ -26,8 +27,14 @@ int main(){
     // return 0;
 
     LibraryManager manager;
+    DataStorage storage;
+
+    storage.loadAll(manager);
+
     MenuUI ui(manager);
     ui.mainMenu();
+
+    storage.saveAll(manager);
     return 0;
 
 }

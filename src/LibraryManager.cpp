@@ -95,6 +95,19 @@ std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) 
     }
     return result;
 }
+std::vector<Book> LibraryManager::findBooksByAuthor(const std::string& fragment) const {
+    std::vector<Book> result;
+
+    const std::string frag = toLower(fragment);
+
+    for (const auto& b : books) {
+        const std::string author = toLower(b.getAuthor());
+        if (author.find(frag) != std::string::npos) {
+            result.push_back(b);
+        }
+    }
+    return result;
+}
 
 void LibraryManager::listUsers() const {
     if (users.empty()) {

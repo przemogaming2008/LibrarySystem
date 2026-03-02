@@ -56,7 +56,6 @@ bool LibraryManager::returnBook(int bookId) {
         if (b.getId() == bookId) {
             if (!b.isBorrowed()) return false;
             b.giveBack();
-            b.setBorrowDate("");
             return true;
         }
     }

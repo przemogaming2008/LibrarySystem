@@ -20,7 +20,7 @@ public:
     int getBorrowerId() const { return borrowerId; }
     
     void borrow(int userId) { borrowerId = userId; }
-    void giveBack() { borrowerId = -1; }
+    void giveBack() { borrowerId = -1; borrowDate.clear(); }
 
     const std::string& getBorrowDate() const { return borrowDate; }
     void setBorrowDate(std::string date) { borrowDate = std::move(date); }

@@ -65,7 +65,15 @@ void MenuUI::handleAddBook() {
 
     std::string title = readLine("Podaj tytuł: ");
     std::string author = readLine("Podaj autora: ");
-    int year = readInt("Podaj rok: ");
+    std::string yearStr = readLine("Podaj rok (opcjonalnie): ");
+    int year = 0;
+    if (!yearStr.empty()) {
+        try {
+            year = std::stoi(yearStr);
+        } catch (...) {
+            std::cout << "Niepoprawny rok – ustawiono brak.\n";
+        }
+    }
     std::string publisher = readLine("Podaj wydawnictwo: ");
 
     int id = manager.addBook(title, author, year, publisher);

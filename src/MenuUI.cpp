@@ -45,20 +45,6 @@ std::string MenuUI::readLine(const char* prompt) {
     return s;
 }
 
-void MenuUI::printBooksTableHeader() {
-    std::cout << "ID  | "
-              << std::left << std::setw(25) << "Tytuł" << " | "
-              << std::left << std::setw(20) << "Autor" << " | "
-              << "Status\n";
-    std::cout << "-----------------------------------------------------------------\n";
-}
-
-void MenuUI::printUsersTableHeader() {
-    std::cout << "ID  | "
-              << std::left << std::setw(20) << "Imię i nazwisko" << " | "
-              << "Dział\n";
-    std::cout << "-----------------------------------------------------------------\n";
-}
 
 void MenuUI::handleAddBook() {
     std::cout << "\n=== Dodaj nowa książkę ===\n";

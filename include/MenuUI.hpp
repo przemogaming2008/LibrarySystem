@@ -28,7 +28,4 @@ private:
     int readInt(const char* prompt);
     std::string readLine(const char* prompt);
 
-    // formatowanie
-    static void printBooksTableHeader();
-    static void printUsersTableHeader();
 };

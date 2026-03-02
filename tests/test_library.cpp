@@ -32,11 +32,11 @@ void test_borrow_return() {
     int bookId = m.addBook("Hobbit","Tolkien",1937,"AU");
     int userId = m.addUser("Jan","Kowalski","IT");
 
-    assert(m.borrowBook(bookId, userId) == true);
-    assert(m.borrowBook(bookId, userId) == false);
+   assert(m.borrowBook(bookId, userId) == BorrowResult::Ok);
+    assert(m.borrowBook(bookId, userId) == BorrowResult::AlreadyBorrowed);
 
-    assert(m.returnBook(bookId) == true);
-    assert(m.returnBook(bookId) == false);
+    assert(m.returnBook(bookId) == ReturnResult::Ok);
+    assert(m.returnBook(bookId) == ReturnResult::NotBorrowed);
 
     std::cout << "test_borrow_return OK\n";
 }

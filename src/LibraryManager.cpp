@@ -26,8 +26,7 @@ int LibraryManager::addUser(std::string first, std::string last, std::string dep
     users.push_back(std::move(u));
     return id;
 }
-bool LibraryManager::borrowBook(int bookId, int userId) {
-    //if user exist?
+BorrowResult LibraryManager::borrowBook(int bookId, int userId) {
     bool userExists = false;
     for (const auto& u : users) {
         if (u.getId() == userId) {
@@ -35,31 +34,32 @@ bool LibraryManager::borrowBook(int bookId, int userId) {
             break;
         }
     }
-    if (!userExists) return false;
+    if (!userExists) return BorrowResult::UserNotFound;
 
-    //find and borrow
+    // find book
     for (auto& b : books) {
         if (b.getId() == bookId) {
-            if (b.isBorrowed()) return false;
+            if (b.isBorrowed()) return BorrowResult::AlreadyBorrowed;
+
             b.borrow(userId);
             b.setBorrowDate(getCurrentDate());
-            return true;
+            return BorrowResult::Ok;
         }
     }
 
-    //lack of book
-    return false;
+    return BorrowResult::BookNotFound;
 }
 
-bool LibraryManager::returnBook(int bookId) {
+ReturnResult LibraryManager::returnBook(int bookId) {
     for (auto& b : books) {
         if (b.getId() == bookId) {
-            if (!b.isBorrowed()) return false;
+            if (!b.isBorrowed()) return ReturnResult::NotBorrowed;
+
             b.giveBack();
-            return true;
+            return ReturnResult::Ok;
         }
     }
-    return false; //lack of book
+    return ReturnResult::BookNotFound;
 }
 
 std::optional<BookStatus> LibraryManager::getBookStatus(int bookId) const {

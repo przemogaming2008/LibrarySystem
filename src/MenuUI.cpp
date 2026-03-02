@@ -99,24 +99,41 @@ void MenuUI::handleBorrowBook() {
     int bookId = readInt("Podaj ID książki: ");
     int userId = readInt("Podaj ID czytelnika: ");
 
-    if (manager.borrowBook(bookId, userId)) {
-        std::cout << "Wypożyczono książkę.\n";
-    } else {
-        std::cout << "Nie udało sie wypożyczyć (sprawdz ID / status).\n";
+    auto res = manager.borrowBook(bookId, userId);
+
+    switch (res) {
+        case BorrowResult::Ok:
+            std::cout << "OK: Wypożyczono książkę.\n\n";
+            break;
+        case BorrowResult::UserNotFound:
+            std::cout << "BŁĄD: Nie ma użytkownika o takim ID.\n\n";
+            break;
+        case BorrowResult::BookNotFound:
+            std::cout << "BŁĄD: Nie ma książki o takim ID.\n\n";
+            break;
+        case BorrowResult::AlreadyBorrowed:
+            std::cout << "BŁĄD: Książka jest już wypożyczona.\n\n";
+            break;
     }
-    std::cout << '\n';
 }
 
 void MenuUI::handleReturnBook() {
     std::cout << "\n=== ZWRÓĆ KSIĄŻKĘ ===\n";
     int bookId = readInt("Podaj ID książki: ");
 
-    if (manager.returnBook(bookId)) {
-        std::cout << "Zwrócono książkę.\n";
-    } else {
-        std::cout << "Nie udało sie zwrócić (sprawdz ID / czy byla wypożyczona).\n";
+    auto res = manager.returnBook(bookId);
+
+    switch (res) {
+        case ReturnResult::Ok:
+            std::cout << "OK: Zwrócono książkę.\n\n";
+            break;
+        case ReturnResult::BookNotFound:
+            std::cout << "BŁĄD: Nie ma książki o takim ID.\n\n";
+            break;
+        case ReturnResult::NotBorrowed:
+            std::cout << "BŁĄD: Ta książka nie jest wypożyczona.\n\n";
+            break;
     }
-    std::cout << '\n';
 }
 
 void MenuUI::handleSearchByTitle() {

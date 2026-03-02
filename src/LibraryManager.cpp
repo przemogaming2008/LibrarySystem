@@ -3,6 +3,13 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
+#include <cctype>
+static std::string toLower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(),
+        [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+    return s;
+}
 
 static std::string getCurrentDate() {
     std::time_t t = std::time(nullptr);
@@ -77,8 +84,12 @@ std::optional<BookStatus> LibraryManager::getBookStatus(int bookId) const {
 
 std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) const {
     std::vector<Book> result;
+
+    const std::string frag = toLower(fragment);
+
     for (const auto& b : books) {
-        if (b.getTitle().find(fragment) != std::string::npos) {
+        const std::string title = toLower(b.getTitle());
+        if (title.find(frag) != std::string::npos) {
             result.push_back(b);
         }
     }

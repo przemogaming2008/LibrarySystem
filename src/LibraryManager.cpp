@@ -62,14 +62,17 @@ bool LibraryManager::returnBook(int bookId) {
     return false; //lack of book
 }
 
-bool LibraryManager::getBookStatus(int bookId) const {
-    // true = borrowed, false = avaible or doesnt exist
+std::optional<BookStatus> LibraryManager::getBookStatus(int bookId) const {
     for (const auto& b : books) {
         if (b.getId() == bookId) {
-            return b.isBorrowed();
+            BookStatus st;
+            st.isBorrowed = b.isBorrowed();
+            st.borrowerId = b.getBorrowerId();
+            st.borrowDate = b.getBorrowDate();
+            return st;
         }
     }
-    return false;
+    return std::nullopt;
 }
 
 std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) const {
@@ -129,14 +132,11 @@ void LibraryManager::listBooks() const {
     }
     std::cout << '\n';
 }
-
-bool LibraryManager::bookExists(int bookId) const {
-    for (const auto& b : books) {
-        if (b.getId() == bookId) {
-            return true;
-        }
+const User* LibraryManager::findUserById(int userId) const {
+    for (const auto& u : users) {
+        if (u.getId() == userId) return &u;
     }
-    return false;
+    return nullptr;
 }
 bool LibraryManager::addBookFromStorage(const Book& book) {
     for (const auto& b : books) {

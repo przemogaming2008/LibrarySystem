@@ -142,16 +142,29 @@ void MenuUI::handleCheckStatus() {
     std::cout << "\n=== STATUS KSIĄŻKI ===\n";
     int id = readInt("Podaj ID książki: ");
 
-    if (!manager.bookExists(id)) {
-        std::cout << "BŁĄD: Nie istnieje książka o ID " << id << ".\n\n";
+    auto stOpt = manager.getBookStatus(id);
+    if (!stOpt) {
+        std::cout << "BŁĄD: Nie znaleziono książki o ID " << id << ".\n\n";
         return;
     }
 
-    if (!manager.getBookStatus(id)) {
+    const auto& st = *stOpt;
+
+    if (!st.isBorrowed) {
         std::cout << "Książka jest dostępna.\n\n";
-    } else {
-        std::cout << "Książka jest wypożyczona.\n\n";
+        return;
     }
+
+    std::cout << "Książka jest wypożyczona (ID " << st.borrowerId;
+    if (!st.borrowDate.empty())
+        std::cout << ", od " << st.borrowDate;
+
+    // jeśli dodasz findUserById:
+    if (const User* u = manager.findUserById(st.borrowerId)) {
+        std::cout << ", przez " << u->getFirstName() << " " << u->getLastName();
+    }
+
+    std::cout << ").\n\n";
 }
 
 void MenuUI::mainMenu() {

@@ -27,10 +27,10 @@ public:
 private:
 
     const int id;
-    const std::string title;
-    const std::string author;
-    const int year;
-    const std::string publisher;
+    std::string title;
+    std::string author;
+    int year;
+    std::string publisher;
     
     int borrowerId; // -1 = free
     std::string borrowDate;
@@ -57,8 +57,8 @@ public:
 private:
 
     const int id;
-    const std::string first_name;
-    const std::string last_name;
+    std::string first_name;
+    std::string last_name;
     std::string department;
     std::string email;
 };

@@ -18,7 +18,7 @@ private:
     void handleBorrowBook();
     void handleReturnBook();
     void handleCheckStatus();
-    void handleSearchByTitle();
+    void handleSearch();
 
 
     // helpers UI

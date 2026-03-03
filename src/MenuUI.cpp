@@ -16,7 +16,7 @@ void MenuUI::printMenu() const {
         << "5. Wypożycz książkę\n"
         << "6. Zwróć książkę\n"
         << "7. Sprawdź status książki\n"
-        << "8. Wyszukaj książki po tytule\n"
+        << "8. Wyszukaj książki (tytuł / autor)\n"
         << "9. Wyjście\n"
         << "Wybierz opcję [1-9]: ";
 }
@@ -129,12 +129,24 @@ void MenuUI::handleReturnBook() {
             break;
     }
 }
+void MenuUI::handleSearch() {
+    std::cout << "\n=== WYSZUKIWANIE KSIĄŻEK ===\n";
+    std::cout << "1. Po tytule\n";
+    std::cout << "2. Po autorze\n";
 
-void MenuUI::handleSearchByTitle() {
-    std::cout << "\n=== WYSZUKAJ KSIĄŻKI ===\n";
-    std::string fragment = readLine("Podaj fragment tytułu: ");
+    int mode = readInt("Wybierz [1-2]: ");
+    std::string fragment = readLine("Podaj fragment: ");
 
-    auto results = manager.findBooksByTitle(fragment);
+    std::vector<Book> results;
+
+    if (mode == 1) {
+        results = manager.findBooksByTitle(fragment);
+    } else if (mode == 2) {
+        results = manager.findBooksByAuthor(fragment);
+    } else {
+        std::cout << "Niepoprawny wybór.\n\n";
+        return;
+    }
 
     if (results.empty()) {
         std::cout << "Brak wyników.\n\n";
@@ -149,6 +161,8 @@ void MenuUI::handleSearchByTitle() {
     }
     std::cout << "\n";
 }
+
+
 void MenuUI::handleCheckStatus() {
     std::cout << "\n=== STATUS KSIĄŻKI ===\n";
     int id = readInt("Podaj ID książki: ");
@@ -200,7 +214,7 @@ void MenuUI::mainMenu() {
             case 5: handleBorrowBook(); break;
             case 6: handleReturnBook(); break;
             case 7: handleCheckStatus(); break;
-            case 8: handleSearchByTitle(); break;
+            case 8: handleSearch(); break;
             case 9: std::cout << "Koniec.\n"; return;
             default: std::cout << "Nie ma takiej opcji.\n"; break;
         }

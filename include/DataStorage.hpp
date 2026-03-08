@@ -17,10 +17,10 @@ public:
     */
 
     bool loadAll(LibraryManager& manager,
-                 const std::string& booksFile = "../../data/books.txt",
-                 const std::string& usersFile = "../../data/users.txt");
+                 const std::string& booksFile,
+                 const std::string& usersFile);
 
     bool saveAll(const LibraryManager& manager,
-                 const std::string& booksFile = "../../data/books.txt",
-                 const std::string& usersFile = "../../data/users.txt");
+                 const std::string& booksFile,
+                 const std::string& usersFile);
 };

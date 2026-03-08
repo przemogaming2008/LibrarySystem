@@ -5,6 +5,7 @@
 #include <iostream>
 #include "DataStorage.hpp"
 #include <clocale>
+#include <filesystem>
 
 int main(){
     std::setlocale(LC_ALL, "pl_PL.UTF-8");
@@ -30,12 +31,23 @@ int main(){
     LibraryManager manager;
     DataStorage storage;
 
-    storage.loadAll(manager);
+    const std::string dataDir = "data";
+    const std::string booksFile = dataDir + "/books.txt";
+    const std::string usersFile = dataDir + "/users.txt";
+
+    std::filesystem::create_directories(dataDir);
+
+    if (!storage.loadAll(manager, booksFile, usersFile)) {
+        std::cerr << "Nie udalo sie wczytac danych.\n";
+    }
 
     MenuUI ui(manager);
     ui.mainMenu();
 
-    storage.saveAll(manager);
+    if (!storage.saveAll(manager, booksFile, usersFile)) {
+        std::cerr << "Nie udalo sie zapisac danych.\n";
+        return 1;
+    }
     return 0;
 
 }

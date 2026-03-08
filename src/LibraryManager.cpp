@@ -34,19 +34,25 @@ int LibraryManager::addUser(std::string first, std::string last, std::string dep
     return id;
 }
 BorrowResult LibraryManager::borrowBook(int bookId, int userId) {
-    bool userExists = false;
-    for (const auto& u : users) {
-        if (u.getId() == userId) {
-            userExists = true;
-            break;
-        }
-    }
-    if (!userExists) return BorrowResult::UserNotFound;
 
-    // find book
     for (auto& b : books) {
         if (b.getId() == bookId) {
-            if (b.isBorrowed()) return BorrowResult::AlreadyBorrowed;
+
+            if (b.isBorrowed()) {
+                return BorrowResult::AlreadyBorrowed;
+            }
+
+            bool userExists = false;
+            for (const auto& u : users) {
+                if (u.getId() == userId) {
+                    userExists = true;
+                    break;
+                }
+            }
+
+            if (!userExists) {
+                return BorrowResult::UserNotFound;
+            }
 
             b.borrow(userId);
             b.setBorrowDate(getCurrentDate());

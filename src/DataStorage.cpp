@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <cstdio>
 
 static std::vector<std::string> splitToVector(const std::string& line) {
     std::vector<std::string> out;
@@ -91,34 +92,52 @@ bool DataStorage::saveAll(const LibraryManager& manager,
                           const std::string& usersFile) {
     //USERS
     {
-        std::ofstream out(usersFile, std::ios::trunc);
-        if (!out) return false;
+    std::string tmpFile = usersFile + ".tmp";
 
-        for (const auto& u : manager.getUsers()) {
-            out << u.getId() << ';'
-                << u.getFirstName() << ';'
-                << u.getLastName() << ';'
-                << u.getDepartment() << ';'
-                << u.getEmail()
-                << "\n";
-        }
+    std::ofstream out(tmpFile, std::ios::trunc);
+    if (!out) return false;
+
+    for (const auto& u : manager.getUsers()) {
+        out << u.getId() << ';'
+            << u.getFirstName() << ';'
+            << u.getLastName() << ';'
+            << u.getDepartment() << ';'
+            << u.getEmail()
+            << "\n";
     }
+
+    out.close();
+    if (!out) return false;
+
+    std::remove(usersFile.c_str());
+    if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0)
+        return false;
+}
 
     //BOOKS
     {
-        std::ofstream out(booksFile, std::ios::trunc);
-        if (!out) return false;
+    std::string tmpFile = booksFile + ".tmp";
 
-        for (const auto& b : manager.getBooks()) {
-            out << b.getId() << ';'
-                << b.getTitle() << ';'
-                << b.getAuthor() << ';'
-                << b.getYear() << ';'
-                << b.getPublisher() << ';'
-                << b.getBorrowerId() << ';'
-                << b.getBorrowDate()
-                << "\n";
-        }
+    std::ofstream out(tmpFile, std::ios::trunc);
+    if (!out) return false;
+
+    for (const auto& b : manager.getBooks()) {
+        out << b.getId() << ';'
+            << b.getTitle() << ';'
+            << b.getAuthor() << ';'
+            << b.getYear() << ';'
+            << b.getPublisher() << ';'
+            << b.getBorrowerId() << ';'
+            << b.getBorrowDate()
+            << "\n";
+    }
+
+    out.close();
+    if (!out) return false;
+
+    std::remove(booksFile.c_str());
+    if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0)
+        return false;
     }
 
     return true;

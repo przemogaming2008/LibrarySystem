@@ -105,9 +105,31 @@ void MenuUI::handleBorrowBook() {
         case BorrowResult::BookNotFound:
             std::cout << "BŁĄD: Nie ma książki o takim ID.\n\n";
             break;
-        case BorrowResult::AlreadyBorrowed:
-            std::cout << "BŁĄD: Książka jest już wypożyczona.\n\n";
+        case BorrowResult::AlreadyBorrowed: {
+            auto stOpt = manager.getBookStatus(bookId);
+
+            if (stOpt && stOpt->isBorrowed) {
+                std::cout << "BŁĄD: Książka jest już wypożyczona";
+
+                if (const User* u = manager.findUserById(stOpt->borrowerId)) {
+                    std::cout << " przez " << u->getFirstName() << " "
+                            << u->getLastName()
+                            << " (ID " << stOpt->borrowerId << ")";
+                } else {
+                    std::cout << " (ID użytkownika " << stOpt->borrowerId << ")";
+                }
+
+                if (!stOpt->borrowDate.empty()) {
+                    std::cout << " od " << stOpt->borrowDate;
+                }
+
+                std::cout << ".\n";
+            } else {
+                std::cout << "BŁĄD: Książka jest już wypożyczona.\n";
+            }
             break;
+        }
+
     }
 }
 

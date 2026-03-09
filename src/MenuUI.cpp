@@ -3,6 +3,10 @@
 #include <limits>
 #include <iomanip>
 
+static bool containsSemicolon(const std::string& text) {
+    return text.find(';') != std::string::npos;
+}
+
 void MenuUI::printHeader() const {
     std::cout << "\n=== MENU BIBLIOTEKI ===\n";
 }
@@ -52,6 +56,7 @@ void MenuUI::handleAddBook() {
     std::string title = readLine("Podaj tytuł: ");
     std::string author = readLine("Podaj autora: ");
     std::string yearStr = readLine("Podaj rok (opcjonalnie): ");
+
     int year = 0;
     if (!yearStr.empty()) {
         try {
@@ -61,6 +66,13 @@ void MenuUI::handleAddBook() {
         }
     }
     std::string publisher = readLine("Podaj wydawnictwo: ");
+    
+    if (containsSemicolon(title) ||
+        containsSemicolon(author) ||
+        containsSemicolon(publisher)) {
+        std::cout << "BŁĄD: Znak ';' nie jest dozwolony w danych książki.\n\n";
+        return;
+    }
 
     int id = manager.addBook(title, author, year, publisher);
 
@@ -74,6 +86,13 @@ void MenuUI::handleAddUser() {
     std::string last = readLine("Podaj nazwisko: ");
     std::string dept = readLine("Podaj dział (opcjonalnie): ");
 
+    if (containsSemicolon(first) ||
+        containsSemicolon(last) ||
+        containsSemicolon(dept)) {
+        std::cout << "BŁĄD: Znak ';' nie jest dozwolony w danych użytkownika.\n\n";
+        return;
+    }
+    
     int id = manager.addUser(first, last, dept);
 
     std::cout << "Użytkownik dodany, ID = " << id << "\n";

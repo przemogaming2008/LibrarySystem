@@ -3,7 +3,6 @@
 #include "MenuUI.hpp"
 #include "Models.hpp"
 #include <iostream>
-#include "DataStorage.hpp"
 #include <clocale>
 #include <filesystem>
 
@@ -13,24 +12,6 @@ int main(){
         std::setlocale(LC_ALL, "");
         std::cerr << "Warning: Polish locale not available,\n";
     }
-
-    // LibraryManager manager;
-
-    // Book book{1, "Hobbit", "Tolkien", 1937, "Allen & Unwin"};
-    // User user{1,"Jan","Kowalski"};
-
-    // manager.addBook(book);
-    // manager.addUser(user);
-
-    // std::cout << "is book borrowed: "<< book.isBorrowed() << std::endl;
-    
-    // std::cout << "\n=== LISTA KSIAZEK ===\n";
-    // manager.listBooks();
-
-    // std::cout << "=== LISTA UZYTKOWNIKOW ===\n";
-    // manager.listUsers();
-
-    // return 0;
 
     LibraryManager manager;
     DataStorage storage;

@@ -6,7 +6,10 @@
 static bool containsSemicolon(const std::string& text) {
     return text.find(';') != std::string::npos;
 }
-
+static void waitForEnter() {
+    std::cout << "Naciśnij Enter aby wrócić do menu...";
+    std::cin.get();
+}
 void MenuUI::printHeader() const {
     std::cout << "\n=== MENU BIBLIOTEKI ===\n";
 }
@@ -92,7 +95,7 @@ void MenuUI::handleAddUser() {
         std::cout << "BŁĄD: Znak ';' nie jest dozwolony w danych użytkownika.\n\n";
         return;
     }
-    
+
     int id = manager.addUser(first, last, dept);
 
     std::cout << "Użytkownik dodany, ID = " << id << "\n";
@@ -101,11 +104,15 @@ void MenuUI::handleAddUser() {
 void MenuUI::handleListBooks() {
     std::cout << "\n=== LISTA KSIĄŻEK ===\n";
     manager.listBooks();
+
+    waitForEnter();
 }
 
 void MenuUI::handleListUsers() {
     std::cout << "\n=== LISTA CZYTELNIKÓW ===\n";
     manager.listUsers();
+
+    waitForEnter();
 }
 void MenuUI::handleBorrowBook() {
     std::cout << "\n=== WYPOŻYCZ KSIĄŻKĘ ===\n";

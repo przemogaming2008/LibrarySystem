@@ -82,6 +82,8 @@ bool DataStorage::loadAll(LibraryManager& manager,
         }
     }
 
+    manager.fixInvalidBorrowers();
+
     manager.setNextBookId(maxBookId + 1);
     manager.setNextUserId(maxUserId + 1);
     return true;

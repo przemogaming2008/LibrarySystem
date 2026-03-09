@@ -6,10 +6,6 @@
 #include <string>
 #include <optional>
 
-/*Zaimplementuj też LibraryManager z metodami dodawania książki i użytkownika oraz listowania 
-(na razie mogą być "puste" lub proste). - Kompiluj lokalnie, upewnij się że projekt się buduje (na tym etapie main()
- może być tymczasowy – np. testujesz dodawanie kilku książek do vectora i print). */
-
 struct BookStatus {
     bool isBorrowed = false;
     int borrowerId = -1;
@@ -52,6 +48,8 @@ public:
     void setNextUserId(int v) { nextUserId = v; }
     
     const User* findUserById(int userId) const;
+
+    void fixInvalidBorrowers();
 
 private:
 

@@ -183,3 +183,23 @@ bool LibraryManager::addUserFromStorage(const User& user) {
     users.push_back(user);
     return true;
 }
+
+void LibraryManager::fixInvalidBorrowers() {
+    for (auto& b : books) {
+        if (!b.isBorrowed()) {
+            continue;
+        }
+
+        bool borrowerExists = false;
+        for (const auto& u : users) {
+            if (u.getId() == b.getBorrowerId()) {
+                borrowerExists = true;
+                break;
+            }
+        }
+
+        if (!borrowerExists) {
+            b.giveBack();
+        }
+    }
+}

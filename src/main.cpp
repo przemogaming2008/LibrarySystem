@@ -8,7 +8,11 @@
 #include <filesystem>
 
 int main(){
-    std::setlocale(LC_ALL, "pl_PL.UTF-8");
+    if (!std::setlocale(LC_ALL, "pl_PL.UTF-8") &&
+        !std::setlocale(LC_ALL, "Polish_Poland.1250")) {
+        std::setlocale(LC_ALL, "");
+        std::cerr << "Warning: Polish locale not available,\n";
+    }
 
     // LibraryManager manager;
 

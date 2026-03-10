@@ -131,6 +131,71 @@ void test_persistence_save_load() {
 
     std::cout << "test_persistence_save_load OK\n";
 }
+void test_book_status() {
+    LibraryManager m;
+
+    int bookId = m.addBook("Hobbit", "Tolkien", 1937, "AU");
+    int userId = m.addUser("Jan", "Kowalski", "IT");
+
+    m.borrowBook(bookId, userId);
+
+    auto st = m.getBookStatus(bookId);
+
+    assert(st.has_value());
+    assert(st->isBorrowed);
+    assert(st->borrowerId == userId);
+    assert(!st->borrowDate.empty());
+
+    std::cout << "test_book_status OK\n";
+}
+void test_search_title() {
+    LibraryManager m;
+
+    m.addBook("Clean Code", "Martin", 2008, "PH");
+    m.addBook("Hobbit", "Tolkien", 1937, "AU");
+
+    auto result = m.findBooksByTitle("Clean");
+
+    assert(result.size() == 1);
+    assert(result[0].getTitle() == "Clean Code");
+
+    std::cout << "test_search_title OK\n";
+}
+void test_search_author() {
+    LibraryManager m;
+
+    m.addBook("Clean Code", "Robert Martin", 2008, "PH");
+    m.addBook("Hobbit", "Tolkien", 1937, "AU");
+
+    auto result = m.findBooksByAuthor("Martin");
+
+    assert(result.size() == 1);
+    assert(result[0].getAuthor() == "Robert Martin");
+
+    std::cout << "test_search_author OK\n";
+}
+void test_persistence() {
+    LibraryManager m;
+    DataStorage storage;
+
+    int bookId = m.addBook("Hobbit", "Tolkien", 1937, "AU");
+    int userId = m.addUser("Jan", "Kowalski", "IT");
+
+    m.borrowBook(bookId, userId);
+
+    storage.saveAll(m, "books_test.txt", "users_test.txt");
+
+    LibraryManager m2;
+    storage.loadAll(m2, "books_test.txt", "users_test.txt");
+
+    auto st = m2.getBookStatus(bookId);
+
+    assert(st.has_value());
+    assert(st->isBorrowed);
+    assert(st->borrowerId == userId);
+
+    std::cout << "test_persistence OK\n";
+}
 int main() {
     test_add_book();
     test_add_user();
@@ -139,6 +204,11 @@ int main() {
     test_status_after_borrow();
     test_search_case_insensitive();
     test_persistence_save_load();
+
+    test_book_status();
+    test_search_title();
+    test_search_author();
+    test_persistence();
 
     std::cout << "\nALL TESTS PASSED\n";
     return 0;

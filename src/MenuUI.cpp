@@ -336,6 +336,11 @@ void MenuUI::handleSearch() {
     int mode = readInt("Wybierz [1-2]: ");
     std::string fragment = readLine("Podaj fragment: ");
 
+    if (isBlank(fragment)) {
+        std::cout << "BŁĄD: Fragment wyszukiwania nie może być pusty.\n\n";
+        return;
+    }
+
     std::vector<Book> results;
 
     if (mode == 1) {

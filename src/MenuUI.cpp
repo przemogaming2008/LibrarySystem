@@ -103,14 +103,64 @@ void MenuUI::handleAddUser() {
 
 void MenuUI::handleListBooks() {
     std::cout << "\n=== LISTA KSIĄŻEK ===\n";
-    manager.listBooks();
+
+    const auto& books = manager.getBooks();
+
+    if (books.empty()) {
+        std::cout << "Brak książek w bibliotece.\n";
+        waitForEnter();
+        return;
+    }
+
+    std::cout << "ID | Tytuł | Autor | Status\n";
+    std::cout << "---------------------------------------------------------------\n";
+
+    for (const auto& b : books) {
+        std::cout << b.getId() << " | "
+                  << b.getTitle() << " | "
+                  << b.getAuthor() << " | ";
+
+        if (!b.isBorrowed()) {
+            std::cout << "dostępna";
+        } else {
+            std::cout << "wypożyczona (ID "
+                      << b.getBorrowerId()
+                      << ", od "
+                      << b.getBorrowDate()
+                      << ")";
+        }
+
+        std::cout << "\n";
+    }
+    std::cout << "\n";
 
     waitForEnter();
 }
 
 void MenuUI::handleListUsers() {
     std::cout << "\n=== LISTA CZYTELNIKÓW ===\n";
-    manager.listUsers();
+
+    const auto& users = manager.getUsers();
+
+    if (users.empty()) {
+        std::cout << "Brak użytkowników.\n";
+        waitForEnter();
+        return;
+    }
+
+    std::cout << "Lista użytkowników:\n";
+    for (const auto& u : users) {
+        std::cout << u.getId() << ". "
+                  << u.getFirstName() << " "
+                  << u.getLastName();
+
+        if (!u.getDepartment().empty()) {
+            std::cout << " (Dział: " << u.getDepartment() << ")";
+        }
+
+        std::cout << "\n";
+    }
+    std::cout << "\n";
 
     waitForEnter();
 }

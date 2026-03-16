@@ -34,9 +34,6 @@ public:
     std::optional<BookStatus> getBookStatus(int bookId) const;
     std::vector<Book> findBooksByTitle(const std::string& fragment) const;
     std::vector<Book> findBooksByAuthor(const std::string& fragment) const;
-
-    void listBooks() const;
-    void listUsers() const;
     
     const std::vector<Book>& getBooks() const { return books; }
     const std::vector<User>& getUsers() const { return users; }

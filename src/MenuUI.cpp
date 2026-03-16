@@ -68,9 +68,22 @@ void MenuUI::handleAddBook() {
     int year = 0;
     if (!yearStr.empty()) {
         try {
-            year = std::stoi(yearStr);
+            size_t pos = 0;
+            int parsedYear = std::stoi(yearStr, &pos);
+
+            if (pos != yearStr.size()) {
+                throw std::invalid_argument("extra characters");
+            }
+
+            if (parsedYear < 0 || parsedYear > 2100) {
+                std::cout << "BŁĄD: Rok musi być w zakresie 0–2100.\n\n";
+                return;
+            }
+
+            year = parsedYear;
         } catch (...) {
-            std::cout << "Niepoprawny rok – ustawiono brak.\n";
+            std::cout << "BŁĄD: Niepoprawny rok.\n\n";
+            return;
         }
     }
     std::string publisher = readLine("Podaj wydawnictwo: ");

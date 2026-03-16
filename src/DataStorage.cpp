@@ -35,6 +35,12 @@ static std::string trim(const std::string& s) {
     return s.substr(start, end - start);
 }
 
+static bool containsForbiddenStorageChars(const std::string& text) {
+    return text.find(';') != std::string::npos ||
+           text.find('\n') != std::string::npos ||
+           text.find('\r') != std::string::npos;
+}
+
 static bool safeToInt(const std::string& text, int& out) {
     try {
         std::string t = trim(text);
@@ -233,6 +239,13 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     if (!out) return false;
 
     for (const auto& u : manager.getUsers()) {
+        if (containsForbiddenStorageChars(u.getFirstName()) ||
+            containsForbiddenStorageChars(u.getLastName()) ||
+            containsForbiddenStorageChars(u.getDepartment()) ||
+            containsForbiddenStorageChars(u.getEmail())) {
+            std::remove(tmpFile.c_str());
+            return false;
+        }
         out << u.getId() << ';'
             << u.getFirstName() << ';'
             << u.getLastName() << ';'
@@ -258,6 +271,13 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     if (!out) return false;
 
     for (const auto& b : manager.getBooks()) {
+        if (containsForbiddenStorageChars(b.getTitle()) ||
+            containsForbiddenStorageChars(b.getAuthor()) ||
+            containsForbiddenStorageChars(b.getPublisher()) ||
+            containsForbiddenStorageChars(b.getBorrowDate())) {
+            std::remove(tmpFile.c_str());
+            return false;
+        }
         out << b.getId() << ';'
             << b.getTitle() << ';'
             << b.getAuthor() << ';'

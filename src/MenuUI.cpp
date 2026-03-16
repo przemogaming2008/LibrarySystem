@@ -3,8 +3,10 @@
 #include <limits>
 #include <iomanip>
 
-static bool containsSemicolon(const std::string& text) {
-    return text.find(';') != std::string::npos;
+static bool containsForbiddenInputChars(const std::string& text) {
+    return text.find(';') != std::string::npos ||
+           text.find('\n') != std::string::npos ||
+           text.find('\r') != std::string::npos;
 }
 static void waitForEnter() {
     std::cout << "Naciśnij Enter aby wrócić do menu...";
@@ -70,10 +72,10 @@ void MenuUI::handleAddBook() {
     }
     std::string publisher = readLine("Podaj wydawnictwo: ");
     
-    if (containsSemicolon(title) ||
-        containsSemicolon(author) ||
-        containsSemicolon(publisher)) {
-        std::cout << "BŁĄD: Znak ';' nie jest dozwolony w danych książki.\n\n";
+    if (containsForbiddenInputChars(title) ||
+        containsForbiddenInputChars(author) ||
+        containsForbiddenInputChars(publisher)) {
+        std::cout << "BŁĄD: Znaki ';', '\\n' i '\\r' nie są dozwolone w danych książki.\n\n";
         return;
     }
 
@@ -89,10 +91,10 @@ void MenuUI::handleAddUser() {
     std::string last = readLine("Podaj nazwisko: ");
     std::string dept = readLine("Podaj dział (opcjonalnie): ");
 
-    if (containsSemicolon(first) ||
-        containsSemicolon(last) ||
-        containsSemicolon(dept)) {
-        std::cout << "BŁĄD: Znak ';' nie jest dozwolony w danych użytkownika.\n\n";
+    if (containsForbiddenInputChars(first) ||
+        containsForbiddenInputChars(last) ||
+        containsForbiddenInputChars(dept)) {
+        std::cout << "BŁĄD: Znaki ';', '\\n' i '\\r' nie są dozwolone w danych użytkownika.\n\n";
         return;
     }
 

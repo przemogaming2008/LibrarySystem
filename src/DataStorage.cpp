@@ -225,10 +225,11 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     out.close();
     if (!out) return false;
 
-    std::remove(usersFile.c_str());
-    if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0)
+    if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0) {
+        std::remove(tmpFile.c_str());
         return false;
-}
+    }
+    }
 
     //BOOKS
     {
@@ -251,10 +252,11 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     out.close();
     if (!out) return false;
 
-    std::remove(booksFile.c_str());
-    if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0)
+    if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0) {
+        std::remove(tmpFile.c_str());
         return false;
     }
+}
 
     return true;
 }

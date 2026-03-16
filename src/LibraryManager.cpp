@@ -153,7 +153,9 @@ bool LibraryManager::addUserFromStorage(const User& user) {
     return true;
 }
 
-void LibraryManager::fixInvalidBorrowers() {
+int LibraryManager::fixInvalidBorrowers() {
+    int fixedCount = 0;
+
     for (auto& b : books) {
         if (!b.isBorrowed()) {
             continue;
@@ -169,6 +171,9 @@ void LibraryManager::fixInvalidBorrowers() {
 
         if (!borrowerExists) {
             b.giveBack();
+            ++fixedCount;
         }
     }
+
+    return fixedCount;
 }

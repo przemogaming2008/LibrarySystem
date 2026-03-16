@@ -47,7 +47,7 @@ public:
     const User* findUserById(int userId) const;
     const Book* findBookById(int bookId) const;
 
-    void fixInvalidBorrowers();
+    int fixInvalidBorrowers();
 
 private:
 

@@ -174,9 +174,35 @@ void MenuUI::handleBorrowBook() {
     auto res = manager.borrowBook(bookId, userId);
 
     switch (res) {
-        case BorrowResult::Ok:
-            std::cout << "OK: Wypożyczono książkę.\n\n";
+        case BorrowResult::Ok: {
+            const Book* b = manager.findBookById(bookId);
+            const User* u = manager.findUserById(userId);
+            auto stOpt = manager.getBookStatus(bookId);
+
+            std::cout << "OK: Wypożyczono książkę";
+
+            if (b) {
+                std::cout << " \"" << b->getTitle() << "\" (ID " << b->getId() << ")";
+            } else {
+                std::cout << " o ID " << bookId;
+            }
+
+            if (u) {
+                std::cout << " użytkownikowi "
+                        << u->getFirstName() << " "
+                        << u->getLastName()
+                        << " (ID " << u->getId() << ")";
+            } else {
+                std::cout << " użytkownikowi o ID " << userId;
+            }
+
+            if (stOpt && !stOpt->borrowDate.empty()) {
+                std::cout << " od " << stOpt->borrowDate;
+            }
+
+            std::cout << ".\n\n";
             break;
+        }
         case BorrowResult::UserNotFound:
             std::cout << "BŁĄD: Nie ma użytkownika o takim ID.\n\n";
             break;
@@ -215,11 +241,38 @@ void MenuUI::handleReturnBook() {
     std::cout << "\n=== ZWRÓĆ KSIĄŻKĘ ===\n";
     int bookId = readInt("Podaj ID książki: ");
 
+    const Book* b = manager.findBookById(bookId);
+    auto stBefore = manager.getBookStatus(bookId);
+
     auto res = manager.returnBook(bookId);
 
     switch (res) {
         case ReturnResult::Ok:
-            std::cout << "OK: Zwrócono książkę.\n\n";
+            std::cout << "OK: Zwrócono książkę";
+
+            if (b) {
+                std::cout << " \"" << b->getTitle() << "\" (ID " << b->getId() << ")";
+            } else {
+                std::cout << " o ID " << bookId;
+            }
+
+            if (stBefore && stBefore->isBorrowed) {
+                if (const User* u = manager.findUserById(stBefore->borrowerId)) {
+                    std::cout << ", wcześniej wypożyczoną przez "
+                            << u->getFirstName() << " "
+                            << u->getLastName()
+                            << " (ID " << u->getId() << ")";
+                } else {
+                    std::cout << ", wcześniej wypożyczoną przez użytkownika o ID "
+                            << stBefore->borrowerId;
+                }
+
+                if (!stBefore->borrowDate.empty()) {
+                    std::cout << " od " << stBefore->borrowDate;
+                }
+            }
+
+            std::cout << ".\n\n";
             break;
         case ReturnResult::BookNotFound:
             std::cout << "BŁĄD: Nie ma książki o takim ID.\n\n";
@@ -267,6 +320,8 @@ void MenuUI::handleCheckStatus() {
     std::cout << "\n=== STATUS KSIĄŻKI ===\n";
     int id = readInt("Podaj ID książki: ");
 
+    const Book* b = manager.findBookById(id);
+
     auto stOpt = manager.getBookStatus(id);
     if (!stOpt) {
         std::cout << "BŁĄD: Nie znaleziono książki o ID " << id << ".\n\n";
@@ -276,15 +331,27 @@ void MenuUI::handleCheckStatus() {
     const auto& st = *stOpt;
 
     if (!st.isBorrowed) {
-        std::cout << "Książka jest dostępna.\n\n";
+        std::cout << "Książka ";
+        if (b) {
+            std::cout << "\"" << b->getTitle() << "\" (ID " << b->getId() << ")";
+        } else {
+            std::cout << "o ID " << id;
+        }
+        std::cout << " jest dostępna.\n\n";
         return;
     }
 
-    std::cout << "Książka jest wypożyczona (ID " << st.borrowerId;
-    if (!st.borrowDate.empty())
-        std::cout << ", od " << st.borrowDate;
+    std::cout << "Książka ";
+    if (b) {
+        std::cout << "\"" << b->getTitle() << "\" (ID " << b->getId() << ")";
+    } else {
+        std::cout << "o ID " << id;
+    }
+    std::cout << " jest wypożyczona (ID użytkownika " << st.borrowerId;
+    if (!st.borrowDate.empty()) {
+    std::cout << ", od " << st.borrowDate;
+    }
 
-    // jeśli dodasz findUserById:
     if (const User* u = manager.findUserById(st.borrowerId)) {
         std::cout << ", przez " << u->getFirstName() << " " << u->getLastName();
     }

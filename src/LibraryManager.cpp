@@ -121,6 +121,14 @@ const User* LibraryManager::findUserById(int userId) const {
     }
     return nullptr;
 }
+const Book* LibraryManager::findBookById(int bookId) const {
+    for (const auto& b : books) {
+        if (b.getId() == bookId) {
+            return &b;
+        }
+    }
+    return nullptr;
+}
 bool LibraryManager::addBookFromStorage(const Book& book) {
     for (const auto& b : books) {
         if (b.getId() == book.getId()) return false;

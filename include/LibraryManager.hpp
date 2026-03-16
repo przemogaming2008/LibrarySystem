@@ -45,6 +45,7 @@ public:
     void setNextUserId(int v) { nextUserId = v; }
     
     const User* findUserById(int userId) const;
+    const Book* findBookById(int bookId) const;
 
     void fixInvalidBorrowers();
 

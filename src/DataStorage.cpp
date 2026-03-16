@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cctype>
 #include <iostream>
+#include <filesystem>
 
 static std::vector<std::string> splitToVector(const std::string& line) {
     std::vector<std::string> out;
@@ -71,10 +72,17 @@ bool DataStorage::loadAll(LibraryManager& manager,
     int maxBookId = 0;
     int maxUserId = 0;
 
+    bool loadOk = true;
+    bool usersExists = std::filesystem::exists(usersFile);
+    bool booksExists = std::filesystem::exists(booksFile);
+
     // USERS
     {
         std::ifstream in(usersFile);
-        if (in) {
+        if (usersExists && !in) {
+            loadOk = false;
+        }
+        else if (in) {
             std::string line;
             while (std::getline(in, line)) {
                 removeUtf8Bom(line);
@@ -88,6 +96,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                 if (f.size() < 3) {
                     std::cerr << "Pominięto niepełny rekord użytkownika: "
                               << line << "\n";
+                    loadOk = false;
                     continue;
                 }
 
@@ -95,6 +104,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                 if (!safeToInt(f[0], id)) {
                     std::cerr << "Pominięto rekord użytkownika z błędnym ID: "
                               << line << "\n";
+                    loadOk = false;
                     continue;
                 }
 
@@ -114,6 +124,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                 if (!manager.addUserFromStorage(u)) {
                     std::cerr << "Pominięto zduplikowany rekord użytkownika: "
                               << line << "\n";
+                    loadOk = false;
                     continue;
                 }
 
@@ -127,7 +138,10 @@ bool DataStorage::loadAll(LibraryManager& manager,
     // BOOKS
     {
         std::ifstream in(booksFile);
-        if (in) {
+        if (booksExists && !in) {
+            loadOk = false;
+        }
+        else if (in) {
             std::string line;
             while (std::getline(in, line)) {
                 removeUtf8Bom(line);
@@ -141,6 +155,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                 if (f.size() < 5) {
                     std::cerr << "Pominięto niepełny rekord książki: "
                               << line << "\n";
+                    loadOk = false;
                     continue;
                 }
 
@@ -148,6 +163,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                 if (!safeToInt(f[0], id)) {
                     std::cerr << "Pominięto rekord książki z błędnym ID: "
                               << line << "\n";
+                    loadOk = false;
                     continue;
                 }
 
@@ -160,6 +176,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                     if (!safeToInt(f[3], year)) {
                         std::cerr << "Pominięto rekord książki z błędnym rokiem: "
                                   << line << "\n";
+                        loadOk = false;
                         continue;
                     }
                 }
@@ -169,6 +186,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                     if (!safeToInt(f[5], borrowerId)) {
                         std::cerr << "Pominięto rekord książki z błędnym borrowerId: "
                                   << line << "\n";
+                        loadOk = false;
                         continue;
                     }
                 }
@@ -185,6 +203,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
                 if (!manager.addBookFromStorage(b)) {
                     std::cerr << "Pominięto zduplikowany rekord książki: "
                               << line << "\n";
+                    loadOk = false;
                     continue;
                 }
 
@@ -200,7 +219,7 @@ bool DataStorage::loadAll(LibraryManager& manager,
     manager.setNextBookId(maxBookId + 1);
     manager.setNextUserId(maxUserId + 1);
 
-    return true;
+    return loadOk;
 }
 
 bool DataStorage::saveAll(const LibraryManager& manager,

@@ -196,6 +196,7 @@ void test_persistence() {
 
     std::cout << "test_persistence OK\n";
 }
+
 int main() {
     test_add_book();
     test_add_user();

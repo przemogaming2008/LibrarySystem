@@ -21,12 +21,20 @@ static std::string getCurrentDate() {
 }
 
 int LibraryManager::addBook(std::string title, std::string author, int year, std::string publisher) {
+    if (title.find_first_not_of(" \t\n\r") == std::string::npos ||
+        author.find_first_not_of(" \t\n\r") == std::string::npos) {
+        return -1;
+    }
     int id = nextBookId++;
     books.emplace_back(id, std::move(title), std::move(author), year, std::move(publisher));
     return id;
 }
 
 int LibraryManager::addUser(std::string first, std::string last, std::string department) {
+    if (first.find_first_not_of(" \t\n\r") == std::string::npos ||
+        last.find_first_not_of(" \t\n\r") == std::string::npos) {
+        return -1;
+    }
     int id = nextUserId++;
     User u{id, std::move(first), std::move(last)};
     if (!department.empty()) u.setDepartment(std::move(department));

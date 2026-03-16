@@ -12,6 +12,9 @@ static void waitForEnter() {
     std::cout << "Naciśnij Enter aby wrócić do menu...";
     std::cin.get();
 }
+static bool isBlank(const std::string& text) {
+    return text.find_first_not_of(" \t\n\r") == std::string::npos;
+}
 void MenuUI::printHeader() const {
     std::cout << "\n=== MENU BIBLIOTEKI ===\n";
 }
@@ -71,6 +74,16 @@ void MenuUI::handleAddBook() {
         }
     }
     std::string publisher = readLine("Podaj wydawnictwo: ");
+
+    if (isBlank(title)) {
+        std::cout << "BŁĄD: Tytuł książki nie może być pusty.\n\n";
+        return;
+    }
+
+    if (isBlank(author)) {
+        std::cout << "BŁĄD: Autor książki nie może być pusty.\n\n";
+        return;
+    }
     
     if (containsForbiddenInputChars(title) ||
         containsForbiddenInputChars(author) ||
@@ -80,6 +93,11 @@ void MenuUI::handleAddBook() {
     }
 
     int id = manager.addBook(title, author, year, publisher);
+
+    if (id == -1) {
+        std::cout << "BŁĄD: Nie udało się dodać książki.\n\n";
+        return;
+    }
 
     std::cout << "Książka dodana pomyślnie z ID = " << id << "\n";
 }
@@ -91,6 +109,16 @@ void MenuUI::handleAddUser() {
     std::string last = readLine("Podaj nazwisko: ");
     std::string dept = readLine("Podaj dział (opcjonalnie): ");
 
+    if (isBlank(first)) {
+        std::cout << "BŁĄD: Imię użytkownika nie może być puste.\n\n";
+        return;
+    }
+
+    if (isBlank(last)) {
+        std::cout << "BŁĄD: Nazwisko użytkownika nie może być puste.\n\n";
+        return;
+    }
+
     if (containsForbiddenInputChars(first) ||
         containsForbiddenInputChars(last) ||
         containsForbiddenInputChars(dept)) {
@@ -99,6 +127,11 @@ void MenuUI::handleAddUser() {
     }
 
     int id = manager.addUser(first, last, dept);
+
+    if (id == -1) {
+        std::cout << "BŁĄD: Nie udało się dodać użytkownika.\n\n";
+        return;
+    }
 
     std::cout << "Użytkownik dodany, ID = " << id << "\n";
 }

@@ -263,8 +263,21 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     if (!out) return false;
 
     if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0) {
-        std::remove(tmpFile.c_str());
-        return false;
+        std::string backupFile = usersFile + ".bak";
+        std::remove(backupFile.c_str());
+
+        if (std::rename(usersFile.c_str(), backupFile.c_str()) != 0) {
+            std::remove(tmpFile.c_str());
+            return false;
+        }
+
+        if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0) {
+            std::rename(backupFile.c_str(), usersFile.c_str());
+            std::remove(tmpFile.c_str());
+            return false;
+        }
+
+        std::remove(backupFile.c_str());
     }
     }
 
@@ -297,8 +310,21 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     if (!out) return false;
 
     if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0) {
-        std::remove(tmpFile.c_str());
-        return false;
+        std::string backupFile = booksFile + ".bak";
+        std::remove(backupFile.c_str());
+
+        if (std::rename(booksFile.c_str(), backupFile.c_str()) != 0) {
+            std::remove(tmpFile.c_str());
+            return false;
+        }
+
+        if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0) {
+            std::rename(backupFile.c_str(), booksFile.c_str());
+            std::remove(tmpFile.c_str());
+            return false;
+        }
+
+        std::remove(backupFile.c_str());
     }
 }
 

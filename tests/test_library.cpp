@@ -4,6 +4,7 @@
 #include <cstdio> 
 #include "LibraryManager.hpp"
 #include "DataStorage.hpp"
+#include <fstream>
 
 void test_add_book() {
     LibraryManager m;
@@ -196,7 +197,140 @@ void test_persistence() {
 
     std::cout << "test_persistence OK\n";
 }
+void test_borrow_nonexistent_book() {
+    LibraryManager m;
+    int userId = m.addUser("Jan", "Kowalski", "IT");
 
+    assert(m.borrowBook(999, userId) == BorrowResult::BookNotFound);
+
+    std::cout << "test_borrow_nonexistent_book OK\n";
+}
+void test_borrow_nonexistent_user() {
+    LibraryManager m;
+    int bookId = m.addBook("Hobbit", "Tolkien", 1937, "AU");
+
+    assert(m.borrowBook(bookId, 999) == BorrowResult::UserNotFound);
+
+    std::cout << "test_borrow_nonexistent_user OK\n";
+}
+
+void test_return_nonexistent_book() {
+    LibraryManager m;
+
+    assert(m.returnBook(999) == ReturnResult::BookNotFound);
+
+    std::cout << "test_return_nonexistent_book OK\n";
+}
+
+void test_status_nonexistent_book() {
+    LibraryManager m;
+
+    assert(!m.getBookStatus(999).has_value());
+
+    std::cout << "test_status_nonexistent_book OK\n";
+}
+void test_load_missing_files() {
+    const std::string booksFile = "missing_books_test.txt";
+    const std::string usersFile = "missing_users_test.txt";
+
+    std::remove(booksFile.c_str());
+    std::remove(usersFile.c_str());
+
+    LibraryManager m;
+    DataStorage storage;
+
+    bool ok = storage.loadAll(m, booksFile, usersFile);
+    assert(ok == true);
+
+    assert(m.getBooks().empty());
+    assert(m.getUsers().empty());
+
+    std::cout << "test_load_missing_files OK\n";
+}
+void test_load_invalid_user_record() {
+    const std::string booksFile = "books_invalid_user_test.txt";
+    const std::string usersFile = "users_invalid_user_test.txt";
+
+    {
+        std::ofstream u(usersFile);
+        u << "bad_id;Jan;Kowalski;IT;jan@example.com\n";
+    }
+    {
+        std::ofstream b(booksFile);
+        b << "1;Hobbit;Tolkien;1937;AU;-1;\n";
+    }
+
+    LibraryManager m;
+    DataStorage storage;
+
+    bool ok = storage.loadAll(m, booksFile, usersFile);
+    assert(ok == false);
+
+    std::remove(booksFile.c_str());
+    std::remove(usersFile.c_str());
+
+    std::cout << "test_load_invalid_user_record OK\n";
+}
+void test_fix_invalid_borrower_on_load() {
+    const std::string booksFile = "books_invalid_borrower_test.txt";
+    const std::string usersFile = "users_invalid_borrower_test.txt";
+
+    {
+        std::ofstream u(usersFile);
+        u << "1;Jan;Kowalski;IT;jan@example.com\n";
+    }
+    {
+        std::ofstream b(booksFile);
+        b << "1;Hobbit;Tolkien;1937;AU;999;2026-01-01\n";
+    }
+
+    LibraryManager m;
+    DataStorage storage;
+
+    bool ok = storage.loadAll(m, booksFile, usersFile);
+    assert(ok == false);
+
+    auto st = m.getBookStatus(1);
+    assert(st.has_value());
+    assert(st->isBorrowed == false);
+
+    std::remove(booksFile.c_str());
+    std::remove(usersFile.c_str());
+
+    std::cout << "test_fix_invalid_borrower_on_load OK\n";
+}
+void test_empty_search_returns_nothing() {
+    LibraryManager m;
+
+    m.addBook("Hobbit", "Tolkien", 1937, "AU");
+    m.addBook("Clean Code", "Robert Martin", 2008, "PH");
+
+    auto byTitle = m.findBooksByTitle("");
+    auto byAuthor = m.findBooksByAuthor("");
+
+    assert(byTitle.empty());
+    assert(byAuthor.empty());
+
+    std::cout << "test_empty_search_returns_nothing OK\n";
+}
+void test_add_user_rejects_blank_required_fields() {
+    LibraryManager m;
+
+    assert(m.addUser("", "Kowalski", "IT", "") == -1);
+    assert(m.addUser("Jan", "", "IT", "") == -1);
+    assert(m.addUser("   ", "Kowalski", "IT", "") == -1);
+
+    std::cout << "test_add_user_rejects_blank_required_fields OK\n";
+}
+void test_add_book_rejects_blank_required_fields() {
+    LibraryManager m;
+
+    assert(m.addBook("", "Tolkien", 1937, "AU") == -1);
+    assert(m.addBook("Hobbit", "", 1937, "AU") == -1);
+    assert(m.addBook("   ", "Tolkien", 1937, "AU") == -1);
+
+    std::cout << "test_add_book_rejects_blank_required_fields OK\n";
+}
 int main() {
     test_add_book();
     test_add_user();
@@ -210,6 +344,17 @@ int main() {
     test_search_title();
     test_search_author();
     test_persistence();
+
+    test_borrow_nonexistent_book();
+    test_borrow_nonexistent_user();
+    test_return_nonexistent_book();
+    test_status_nonexistent_book();
+    test_load_missing_files();
+    test_load_invalid_user_record();
+    test_fix_invalid_borrower_on_load();
+    test_empty_search_returns_nothing();
+    test_add_user_rejects_blank_required_fields();
+    test_add_book_rejects_blank_required_fields();
 
     std::cout << "\nALL TESTS PASSED\n";
     return 0;

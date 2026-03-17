@@ -30,14 +30,23 @@ int LibraryManager::addBook(std::string title, std::string author, int year, std
     return id;
 }
 
-int LibraryManager::addUser(std::string first, std::string last, std::string department) {
+int LibraryManager::addUser(std::string first, std::string last, std::string department, std::string email) {
     if (first.find_first_not_of(" \t\n\r") == std::string::npos ||
         last.find_first_not_of(" \t\n\r") == std::string::npos) {
         return -1;
     }
+
     int id = nextUserId++;
     User u{id, std::move(first), std::move(last)};
-    if (!department.empty()) u.setDepartment(std::move(department));
+
+    if (!department.empty()) {
+        u.setDepartment(std::move(department));
+    }
+
+    if (!email.empty()) {
+        u.setEmail(std::move(email));
+    }
+
     users.push_back(std::move(u));
     return id;
 }

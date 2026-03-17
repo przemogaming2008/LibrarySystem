@@ -121,6 +121,7 @@ void MenuUI::handleAddUser() {
     std::string first = readLine("Podaj imię: ");
     std::string last = readLine("Podaj nazwisko: ");
     std::string dept = readLine("Podaj dział (opcjonalnie): ");
+    std::string email = readLine("Podaj e-mail (opcjonalnie): ");
 
     if (isBlank(first)) {
         std::cout << "BŁĄD: Imię użytkownika nie może być puste.\n\n";
@@ -134,12 +135,13 @@ void MenuUI::handleAddUser() {
 
     if (containsForbiddenInputChars(first) ||
         containsForbiddenInputChars(last) ||
-        containsForbiddenInputChars(dept)) {
+        containsForbiddenInputChars(dept) ||
+        containsForbiddenInputChars(email)) {
         std::cout << "BŁĄD: Znaki ';', '\\n' i '\\r' nie są dozwolone w danych użytkownika.\n\n";
         return;
     }
 
-    int id = manager.addUser(first, last, dept);
+    int id = manager.addUser(first, last, dept, email);
 
     if (id == -1) {
         std::cout << "BŁĄD: Nie udało się dodać użytkownika.\n\n";
@@ -199,11 +201,15 @@ void MenuUI::handleListUsers() {
     std::cout << "Lista użytkowników:\n";
     for (const auto& u : users) {
         std::cout << u.getId() << ". "
-                  << u.getFirstName() << " "
-                  << u.getLastName();
+                << u.getFirstName() << " "
+                << u.getLastName();
 
         if (!u.getDepartment().empty()) {
             std::cout << " (Dział: " << u.getDepartment() << ")";
+        }
+
+        if (!u.getEmail().empty()) {
+            std::cout << " [e-mail: " << u.getEmail() << "]";
         }
 
         std::cout << "\n";

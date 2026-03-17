@@ -26,7 +26,7 @@ enum class ReturnResult {
 class LibraryManager{
 public:
     int addBook(std::string title, std::string author, int year, std::string publisher);
-    int addUser(std::string first, std::string last, std::string department);
+    int addUser(std::string first, std::string last, std::string department, std::string email = "");
 
     BorrowResult borrowBook(int bookId, int userId);
     ReturnResult returnBook(int bookId);

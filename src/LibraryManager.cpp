@@ -106,6 +106,11 @@ std::optional<BookStatus> LibraryManager::getBookStatus(int bookId) const {
 }
 
 std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) const {
+    
+    if (fragment.find_first_not_of(" \t\n\r") == std::string::npos) {
+        return {};
+    }
+
     std::vector<Book> result;
 
     const std::string frag = toLower(fragment);
@@ -119,6 +124,11 @@ std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) 
     return result;
 }
 std::vector<Book> LibraryManager::findBooksByAuthor(const std::string& fragment) const {
+    
+     if (fragment.find_first_not_of(" \t\n\r") == std::string::npos) {
+        return {};
+    }
+
     std::vector<Book> result;
 
     const std::string frag = toLower(fragment);

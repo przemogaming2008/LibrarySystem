@@ -271,7 +271,7 @@ void test_load_invalid_user_record() {
 
     std::cout << "test_load_invalid_user_record OK\n";
 }
-void test_fix_invalid_borrower_on_load() {
+void test_detect_invalid_borrower_on_load() {
     const std::string booksFile = "books_invalid_borrower_test.txt";
     const std::string usersFile = "users_invalid_borrower_test.txt";
 
@@ -292,12 +292,13 @@ void test_fix_invalid_borrower_on_load() {
 
     auto st = m.getBookStatus(1);
     assert(st.has_value());
-    assert(st->isBorrowed == false);
+    assert(st->isBorrowed == true);
+    assert(st->borrowerId == 999);
 
     std::remove(booksFile.c_str());
     std::remove(usersFile.c_str());
 
-    std::cout << "test_fix_invalid_borrower_on_load OK\n";
+    std::cout << "test_detect_invalid_borrower_on_load OK\n";
 }
 void test_empty_search_returns_nothing() {
     LibraryManager m;
@@ -351,7 +352,7 @@ int main() {
     test_status_nonexistent_book();
     test_load_missing_files();
     test_load_invalid_user_record();
-    test_fix_invalid_borrower_on_load();
+    test_detect_invalid_borrower_on_load();
     test_empty_search_returns_nothing();
     test_add_user_rejects_blank_required_fields();
     test_add_book_rejects_blank_required_fields();

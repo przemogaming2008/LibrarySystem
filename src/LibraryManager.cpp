@@ -5,6 +5,38 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+
+static bool isBlank(const std::string& text) {
+    return text.find_first_not_of(" \t\n\r") == std::string::npos;
+}
+
+static bool containsForbiddenChars(const std::string& text) {
+    return text.find(';') != std::string::npos ||
+           text.find('\n') != std::string::npos ||
+           text.find('\r') != std::string::npos;
+}
+
+static bool isValidBookData(const std::string& title,
+                            const std::string& author,
+                            const std::string& publisher) {
+    return !isBlank(title) &&
+           !isBlank(author) &&
+           !containsForbiddenChars(title) &&
+           !containsForbiddenChars(author) &&
+           !containsForbiddenChars(publisher);
+}
+
+static bool isValidUserData(const std::string& first,
+                            const std::string& last,
+                            const std::string& department,
+                            const std::string& email) {
+    return !isBlank(first) &&
+           !isBlank(last) &&
+           !containsForbiddenChars(first) &&
+           !containsForbiddenChars(last) &&
+           !containsForbiddenChars(department) &&
+           !containsForbiddenChars(email);
+}
 static std::string toLower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
         [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
@@ -21,8 +53,7 @@ static std::string getCurrentDate() {
 }
 
 int LibraryManager::addBook(std::string title, std::string author, int year, std::string publisher) {
-    if (title.find_first_not_of(" \t\n\r") == std::string::npos ||
-        author.find_first_not_of(" \t\n\r") == std::string::npos) {
+    if (!isValidBookData(title, author, publisher)) {
         return -1;
     }
     int id = nextBookId++;
@@ -31,8 +62,7 @@ int LibraryManager::addBook(std::string title, std::string author, int year, std
 }
 
 int LibraryManager::addUser(std::string first, std::string last, std::string department, std::string email) {
-    if (first.find_first_not_of(" \t\n\r") == std::string::npos ||
-        last.find_first_not_of(" \t\n\r") == std::string::npos) {
+    if (!isValidUserData(first, last, department, email)) {
         return -1;
     }
 
@@ -157,17 +187,30 @@ const Book* LibraryManager::findBookById(int bookId) const {
     return nullptr;
 }
 bool LibraryManager::addBookFromStorage(const Book& book) {
+    if (!isValidBookData(book.getTitle(), book.getAuthor(), book.getPublisher())) {
+        return false;
+    }
+
     for (const auto& b : books) {
         if (b.getId() == book.getId()) return false;
     }
+
     books.push_back(book);
     return true;
 }
 
 bool LibraryManager::addUserFromStorage(const User& user) {
+    if (!isValidUserData(user.getFirstName(),
+                         user.getLastName(),
+                         user.getDepartment(),
+                         user.getEmail())) {
+        return false;
+    }
+
     for (const auto& u : users) {
         if (u.getId() == user.getId()) return false;
     }
+
     users.push_back(user);
     return true;
 }

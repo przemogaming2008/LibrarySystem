@@ -220,9 +220,9 @@ bool DataStorage::loadAll(LibraryManager& manager,
         }
     }
 
-    int fixedBorrowers = manager.fixInvalidBorrowers();
-    if (fixedBorrowers > 0) {
-        std::cerr << "Wykryto i naprawiono " << fixedBorrowers
+    int invalidBorrowers = manager.countInvalidBorrowers();
+    if (invalidBorrowers > 0) {
+        std::cerr << "Wykryto " << invalidBorrowers
                 << " rekord(y) wypożyczeń z nieistniejącym użytkownikiem.\n";
         loadOk = false;
     }

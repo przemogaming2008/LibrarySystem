@@ -1,3 +1,0 @@
-[USERS]
-[BOOKS]
-1;tyt;aut;1;wyd;-1;

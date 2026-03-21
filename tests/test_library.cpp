@@ -85,11 +85,11 @@ static void removeIfExists(const std::string& path) {
     std::remove(path.c_str());
 }
 void test_persistence_save_load() {
-    const std::string booksFile = "books_test.txt";
-    const std::string usersFile = "users_test.txt";
+    const std::string dataFile = "library_test.txt";
 
-    removeIfExists(booksFile);
-    removeIfExists(usersFile);
+    removeIfExists(dataFile);
+    removeIfExists(dataFile + ".tmp");
+    removeIfExists(dataFile + ".bak");
 
     DataStorage storage;
 
@@ -105,7 +105,7 @@ void test_persistence_save_load() {
 
         assert(m.borrowBook(savedBookId, savedUserId) == BorrowResult::Ok);
 
-        bool ok = storage.saveAll(m, booksFile, usersFile);
+        bool ok = storage.saveAll(m, dataFile);
         assert(ok == true);
     }
 
@@ -113,7 +113,7 @@ void test_persistence_save_load() {
     {
         LibraryManager m2;
 
-        bool ok = storage.loadAll(m2, booksFile, usersFile);
+        bool ok = storage.loadAll(m2, dataFile);
         assert(ok == true);
 
         auto stOpt = m2.getBookStatus(savedBookId);
@@ -127,8 +127,9 @@ void test_persistence_save_load() {
         assert(newBookId != savedBookId);
     }
 
-    removeIfExists(booksFile);
-    removeIfExists(usersFile);
+    removeIfExists(dataFile);
+    removeIfExists(dataFile + ".tmp");
+    removeIfExists(dataFile + ".bak");
 
     std::cout << "test_persistence_save_load OK\n";
 }
@@ -184,16 +185,25 @@ void test_persistence() {
 
     m.borrowBook(bookId, userId);
 
-    storage.saveAll(m, "books_test.txt", "users_test.txt");
+    const std::string dataFile = "library_test_simple.txt";
+    removeIfExists(dataFile);
+    removeIfExists(dataFile + ".tmp");
+    removeIfExists(dataFile + ".bak");
+
+    storage.saveAll(m, dataFile);
 
     LibraryManager m2;
-    storage.loadAll(m2, "books_test.txt", "users_test.txt");
+    storage.loadAll(m2, dataFile);
 
     auto st = m2.getBookStatus(bookId);
 
     assert(st.has_value());
     assert(st->isBorrowed);
     assert(st->borrowerId == userId);
+
+    removeIfExists(dataFile);
+    removeIfExists(dataFile + ".tmp");
+    removeIfExists(dataFile + ".bak");
 
     std::cout << "test_persistence OK\n";
 }
@@ -230,16 +240,16 @@ void test_status_nonexistent_book() {
     std::cout << "test_status_nonexistent_book OK\n";
 }
 void test_load_missing_files() {
-    const std::string booksFile = "missing_books_test.txt";
-    const std::string usersFile = "missing_users_test.txt";
+    const std::string dataFile = "missing_library_test.txt";
 
-    std::remove(booksFile.c_str());
-    std::remove(usersFile.c_str());
+    std::remove(dataFile.c_str());
+    std::remove((dataFile + ".tmp").c_str());
+    std::remove((dataFile + ".bak").c_str());
 
     LibraryManager m;
     DataStorage storage;
 
-    bool ok = storage.loadAll(m, booksFile, usersFile);
+    bool ok = storage.loadAll(m, dataFile);
     assert(ok == true);
 
     assert(m.getBooks().empty());
@@ -248,46 +258,43 @@ void test_load_missing_files() {
     std::cout << "test_load_missing_files OK\n";
 }
 void test_load_invalid_user_record() {
-    const std::string booksFile = "books_invalid_user_test.txt";
-    const std::string usersFile = "users_invalid_user_test.txt";
+    const std::string dataFile = "library_invalid_user_test.txt";
 
     {
-        std::ofstream u(usersFile);
-        u << "bad_id;Jan;Kowalski;IT;jan@example.com\n";
-    }
-    {
-        std::ofstream b(booksFile);
-        b << "1;Hobbit;Tolkien;1937;AU;-1;\n";
+        std::ofstream out(dataFile);
+        out << "[USERS]\n";
+        out << "bad_id;Jan;Kowalski;IT;jan@example.com\n";
+        out << "[BOOKS]\n";
+        out << "1;Hobbit;Tolkien;1937;AU;-1;\n";
     }
 
     LibraryManager m;
     DataStorage storage;
 
-    bool ok = storage.loadAll(m, booksFile, usersFile);
+    bool ok = storage.loadAll(m, dataFile);
     assert(ok == false);
 
-    std::remove(booksFile.c_str());
-    std::remove(usersFile.c_str());
+    std::remove(dataFile.c_str());
+    std::remove((dataFile + ".tmp").c_str());
+    std::remove((dataFile + ".bak").c_str());
 
     std::cout << "test_load_invalid_user_record OK\n";
 }
 void test_detect_invalid_borrower_on_load() {
-    const std::string booksFile = "books_invalid_borrower_test.txt";
-    const std::string usersFile = "users_invalid_borrower_test.txt";
+    const std::string dataFile = "library_invalid_borrower_test.txt";
 
     {
-        std::ofstream u(usersFile);
-        u << "1;Jan;Kowalski;IT;jan@example.com\n";
-    }
-    {
-        std::ofstream b(booksFile);
-        b << "1;Hobbit;Tolkien;1937;AU;999;2026-01-01\n";
+        std::ofstream out(dataFile);
+        out << "[USERS]\n";
+        out << "1;Jan;Kowalski;IT;jan@example.com\n";
+        out << "[BOOKS]\n";
+        out << "1;Hobbit;Tolkien;1937;AU;999;2026-01-01\n";
     }
 
     LibraryManager m;
     DataStorage storage;
 
-    bool ok = storage.loadAll(m, booksFile, usersFile);
+    bool ok = storage.loadAll(m, dataFile);
     assert(ok == false);
 
     auto st = m.getBookStatus(1);
@@ -295,8 +302,9 @@ void test_detect_invalid_borrower_on_load() {
     assert(st->isBorrowed == true);
     assert(st->borrowerId == 999);
 
-    std::remove(booksFile.c_str());
-    std::remove(usersFile.c_str());
+    std::remove(dataFile.c_str());
+    std::remove((dataFile + ".tmp").c_str());
+    std::remove((dataFile + ".bak").c_str());
 
     std::cout << "test_detect_invalid_borrower_on_load OK\n";
 }

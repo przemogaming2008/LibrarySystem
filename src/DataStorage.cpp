@@ -73,157 +73,162 @@ static void removeUtf8Bom(std::string& line) {
 }
 
 bool DataStorage::loadAll(LibraryManager& manager,
-                          const std::string& booksFile,
-                          const std::string& usersFile) {
+                          const std::string& dataFile) {
     int maxBookId = 0;
     int maxUserId = 0;
-
     bool loadOk = true;
-    bool usersExists = std::filesystem::exists(usersFile);
-    bool booksExists = std::filesystem::exists(booksFile);
 
-    // USERS
-    {
-        std::ifstream in(usersFile);
-        if (usersExists && !in) {
-            loadOk = false;
-        }
-        else if (in) {
-            std::string line;
-            while (std::getline(in, line)) {
-                removeUtf8Bom(line);
-
-                if (trim(line).empty()) {
-                    continue;
-                }
-
-                auto f = splitToVector(line);
-                // id;firstName;lastName;department;email
-                if (f.size() < 3) {
-                    std::cerr << "Pominięto niepełny rekord użytkownika: "
-                              << line << "\n";
-                    loadOk = false;
-                    continue;
-                }
-
-                int id;
-                if (!safeToInt(f[0], id)) {
-                    std::cerr << "Pominięto rekord użytkownika z błędnym ID: "
-                              << line << "\n";
-                    loadOk = false;
-                    continue;
-                }
-
-                std::string first = f.size() > 1 ? trim(f[1]) : "";
-                std::string last  = f.size() > 2 ? trim(f[2]) : "";
-                std::string dept  = f.size() > 3 ? trim(f[3]) : "";
-                std::string email = f.size() > 4 ? trim(f[4]) : "";
-
-                User u{id, first, last};
-                if (!dept.empty()) {
-                    u.setDepartment(dept);
-                }
-                if (!email.empty()) {
-                    u.setEmail(email);
-                }
-
-                if (!manager.addUserFromStorage(u)) {
-                    std::cerr << "Pominięto zduplikowany rekord użytkownika: "
-                              << line << "\n";
-                    loadOk = false;
-                    continue;
-                }
-
-                if (id > maxUserId) {
-                    maxUserId = id;
-                }
-            }
-        }
+    if (!std::filesystem::exists(dataFile)) {
+        manager.setNextBookId(1);
+        manager.setNextUserId(1);
+        return true;
     }
 
-    // BOOKS
-    {
-        std::ifstream in(booksFile);
-        if (booksExists && !in) {
-            loadOk = false;
+    std::ifstream in(dataFile);
+    if (!in) {
+        return false;
+    }
+
+    enum class Section {
+        None,
+        Users,
+        Books
+    };
+
+    Section section = Section::None;
+    std::string line;
+
+    while (std::getline(in, line)) {
+        removeUtf8Bom(line);
+
+        std::string t = trim(line);
+        if (t.empty()) {
+            continue;
         }
-        else if (in) {
-            std::string line;
-            while (std::getline(in, line)) {
-                removeUtf8Bom(line);
 
-                if (trim(line).empty()) {
-                    continue;
-                }
+        if (t == "[USERS]") {
+            section = Section::Users;
+            continue;
+        }
 
-                auto f = splitToVector(line);
-                // id;title;author;year;publisher;borrowerId;borrowDate
-                if (f.size() < 5) {
-                    std::cerr << "Pominięto niepełny rekord książki: "
+        if (t == "[BOOKS]") {
+            section = Section::Books;
+            continue;
+        }
+
+        auto f = splitToVector(line);
+
+        if (section == Section::Users) {
+            if (f.size() < 3) {
+                std::cerr << "Pominięto niepełny rekord użytkownika: "
+                          << line << "\n";
+                loadOk = false;
+                continue;
+            }
+
+            int id;
+            if (!safeToInt(f[0], id)) {
+                std::cerr << "Pominięto rekord użytkownika z błędnym ID: "
+                          << line << "\n";
+                loadOk = false;
+                continue;
+            }
+
+            std::string first = f.size() > 1 ? trim(f[1]) : "";
+            std::string last  = f.size() > 2 ? trim(f[2]) : "";
+            std::string dept  = f.size() > 3 ? trim(f[3]) : "";
+            std::string email = f.size() > 4 ? trim(f[4]) : "";
+
+            User u{id, first, last};
+            if (!dept.empty()) {
+                u.setDepartment(dept);
+            }
+            if (!email.empty()) {
+                u.setEmail(email);
+            }
+
+            if (!manager.addUserFromStorage(u)) {
+                std::cerr << "Pominięto niepoprawny lub zduplikowany rekord użytkownika: "
+                          << line << "\n";
+                loadOk = false;
+                continue;
+            }
+
+            if (id > maxUserId) {
+                maxUserId = id;
+            }
+        }
+        else if (section == Section::Books) {
+            if (f.size() < 5) {
+                std::cerr << "Pominięto niepełny rekord książki: "
+                          << line << "\n";
+                loadOk = false;
+                continue;
+            }
+
+            int id;
+            if (!safeToInt(f[0], id)) {
+                std::cerr << "Pominięto rekord książki z błędnym ID: "
+                          << line << "\n";
+                loadOk = false;
+                continue;
+            }
+
+            std::string title     = f.size() > 1 ? trim(f[1]) : "";
+            std::string author    = f.size() > 2 ? trim(f[2]) : "";
+            std::string publisher = f.size() > 4 ? trim(f[4]) : "";
+
+            int year = 0;
+            if (f.size() > 3 && !trim(f[3]).empty()) {
+                if (!safeToInt(f[3], year)) {
+                    std::cerr << "Pominięto rekord książki z błędnym rokiem: "
                               << line << "\n";
                     loadOk = false;
                     continue;
-                }
-
-                int id;
-                if (!safeToInt(f[0], id)) {
-                    std::cerr << "Pominięto rekord książki z błędnym ID: "
-                              << line << "\n";
-                    loadOk = false;
-                    continue;
-                }
-
-                std::string title     = f.size() > 1 ? trim(f[1]) : "";
-                std::string author    = f.size() > 2 ? trim(f[2]) : "";
-                std::string publisher = f.size() > 4 ? trim(f[4]) : "";
-
-                int year = 0;
-                if (f.size() > 3 && !trim(f[3]).empty()) {
-                    if (!safeToInt(f[3], year)) {
-                        std::cerr << "Pominięto rekord książki z błędnym rokiem: "
-                                  << line << "\n";
-                        loadOk = false;
-                        continue;
-                    }
-                }
-
-                int borrowerId = -1;
-                if (f.size() > 5 && !trim(f[5]).empty()) {
-                    if (!safeToInt(f[5], borrowerId)) {
-                        std::cerr << "Pominięto rekord książki z błędnym borrowerId: "
-                                  << line << "\n";
-                        loadOk = false;
-                        continue;
-                    }
-                }
-
-                std::string borrowDate = f.size() > 6 ? trim(f[6]) : "";
-
-                Book b{id, title, author, year, publisher};
-
-                if (borrowerId != -1) {
-                    b.borrow(borrowerId);
-                    b.setBorrowDate(borrowDate);
-                }
-
-                if (!manager.addBookFromStorage(b)) {
-                    std::cerr << "Pominięto zduplikowany rekord książki: "
-                              << line << "\n";
-                    loadOk = false;
-                    continue;
-                }
-
-                if (id > maxBookId) {
-                    maxBookId = id;
                 }
             }
+
+            int borrowerId = -1;
+            if (f.size() > 5 && !trim(f[5]).empty()) {
+                if (!safeToInt(f[5], borrowerId)) {
+                    std::cerr << "Pominięto rekord książki z błędnym borrowerId: "
+                              << line << "\n";
+                    loadOk = false;
+                    continue;
+                }
+            }
+
+            std::string borrowDate = f.size() > 6 ? trim(f[6]) : "";
+
+            Book b{id, title, author, year, publisher};
+
+            if (borrowerId != -1) {
+                b.borrow(borrowerId);
+                b.setBorrowDate(borrowDate);
+            }
+
+            if (!manager.addBookFromStorage(b)) {
+                std::cerr << "Pominięto niepoprawny lub zduplikowany rekord książki: "
+                          << line << "\n";
+                loadOk = false;
+                continue;
+            }
+
+            if (id > maxBookId) {
+                maxBookId = id;
+            }
+        }
+        else {
+            std::cerr << "Pominięto rekord poza sekcją danych: "
+                      << line << "\n";
+            loadOk = false;
         }
     }
 
     int invalidBorrowers = manager.countInvalidBorrowers();
     if (invalidBorrowers > 0) {
         std::cerr << "Wykryto " << invalidBorrowers
-                << " rekord(y) wypożyczeń z nieistniejącym użytkownikiem.\n";
+                  << " rekord(y) wypożyczeń z nieistniejącym użytkownikiem.\n";
         loadOk = false;
     }
 
@@ -234,23 +239,23 @@ bool DataStorage::loadAll(LibraryManager& manager,
 }
 
 bool DataStorage::saveAll(const LibraryManager& manager,
-                          const std::string& booksFile,
-                          const std::string& usersFile) {
-    //USERS
-    {
-    std::string tmpFile = usersFile + ".tmp";
+                          const std::string& dataFile) {
+    std::string tmpFile = dataFile + ".tmp";
 
     std::ofstream out(tmpFile, std::ios::trunc);
     if (!out) return false;
 
+    out << "[USERS]\n";
     for (const auto& u : manager.getUsers()) {
         if (containsForbiddenStorageChars(u.getFirstName()) ||
             containsForbiddenStorageChars(u.getLastName()) ||
             containsForbiddenStorageChars(u.getDepartment()) ||
             containsForbiddenStorageChars(u.getEmail())) {
+            out.close();
             std::remove(tmpFile.c_str());
             return false;
         }
+
         out << u.getId() << ';'
             << u.getFirstName() << ';'
             << u.getLastName() << ';'
@@ -259,43 +264,17 @@ bool DataStorage::saveAll(const LibraryManager& manager,
             << "\n";
     }
 
-    out.close();
-    if (!out) return false;
-
-    if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0) {
-        std::string backupFile = usersFile + ".bak";
-        std::remove(backupFile.c_str());
-
-        if (std::rename(usersFile.c_str(), backupFile.c_str()) != 0) {
-            std::remove(tmpFile.c_str());
-            return false;
-        }
-
-        if (std::rename(tmpFile.c_str(), usersFile.c_str()) != 0) {
-            std::rename(backupFile.c_str(), usersFile.c_str());
-            std::remove(tmpFile.c_str());
-            return false;
-        }
-
-        std::remove(backupFile.c_str());
-    }
-    }
-
-    //BOOKS
-    {
-    std::string tmpFile = booksFile + ".tmp";
-
-    std::ofstream out(tmpFile, std::ios::trunc);
-    if (!out) return false;
-
+    out << "[BOOKS]\n";
     for (const auto& b : manager.getBooks()) {
         if (containsForbiddenStorageChars(b.getTitle()) ||
             containsForbiddenStorageChars(b.getAuthor()) ||
             containsForbiddenStorageChars(b.getPublisher()) ||
             containsForbiddenStorageChars(b.getBorrowDate())) {
+            out.close();
             std::remove(tmpFile.c_str());
             return false;
         }
+
         out << b.getId() << ';'
             << b.getTitle() << ';'
             << b.getAuthor() << ';'
@@ -307,26 +286,28 @@ bool DataStorage::saveAll(const LibraryManager& manager,
     }
 
     out.close();
-    if (!out) return false;
+    if (!out) {
+        std::remove(tmpFile.c_str());
+        return false;
+    }
 
-    if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0) {
-        std::string backupFile = booksFile + ".bak";
-        std::remove(backupFile.c_str());
+    std::string backupFile = dataFile + ".bak";
+    std::remove(backupFile.c_str());
 
-        if (std::rename(booksFile.c_str(), backupFile.c_str()) != 0) {
+    if (std::rename(tmpFile.c_str(), dataFile.c_str()) != 0) {
+        if (std::rename(dataFile.c_str(), backupFile.c_str()) != 0) {
             std::remove(tmpFile.c_str());
             return false;
         }
 
-        if (std::rename(tmpFile.c_str(), booksFile.c_str()) != 0) {
-            std::rename(backupFile.c_str(), booksFile.c_str());
+        if (std::rename(tmpFile.c_str(), dataFile.c_str()) != 0) {
+            std::rename(backupFile.c_str(), dataFile.c_str());
             std::remove(tmpFile.c_str());
             return false;
         }
 
         std::remove(backupFile.c_str());
     }
-}
 
     return true;
 }

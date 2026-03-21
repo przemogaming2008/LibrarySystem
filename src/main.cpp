@@ -17,19 +17,18 @@ int main(){
     DataStorage storage;
 
     const std::string dataDir = "data";
-    const std::string booksFile = dataDir + "/books.txt";
-    const std::string usersFile = dataDir + "/users.txt";
+    const std::string dataFile = dataDir + "/library.txt";
 
     std::filesystem::create_directories(dataDir);
 
-    if (!storage.loadAll(manager, booksFile, usersFile)) {
+    if (!storage.loadAll(manager, dataFile)) {
         std::cerr << "Nie udalo sie wczytac danych.\n";
     }
 
     MenuUI ui(manager);
     ui.mainMenu();
 
-    if (!storage.saveAll(manager, booksFile, usersFile)) {
+    if (!storage.saveAll(manager, dataFile)) {
         std::cerr << "Nie udalo sie zapisac danych.\n";
         return 1;
     }

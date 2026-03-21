@@ -17,10 +17,8 @@ public:
     */
 
     bool loadAll(LibraryManager& manager,
-                 const std::string& booksFile,
-                 const std::string& usersFile);
+                const std::string& dataFile);
 
     bool saveAll(const LibraryManager& manager,
-                 const std::string& booksFile,
-                 const std::string& usersFile);
+                const std::string& dataFile);
 };

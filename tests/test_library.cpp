@@ -340,6 +340,45 @@ void test_add_book_rejects_blank_required_fields() {
 
     std::cout << "test_add_book_rejects_blank_required_fields OK\n";
 }
+void test_search_polish_title_case_insensitive() {
+    LibraryManager m;
+
+    m.addBook("Zażółć gęślą jaźń", "Autor", 2020, "X");
+
+    auto r1 = m.findBooksByTitle("zażółć");
+    auto r2 = m.findBooksByTitle("ZAŻÓŁĆ");
+    auto r3 = m.findBooksByTitle("gęślą");
+    auto r4 = m.findBooksByTitle("JAŹŃ");
+
+    assert(r1.size() == 1);
+    assert(r2.size() == 1);
+    assert(r3.size() == 1);
+    assert(r4.size() == 1);
+
+    assert(r1[0].getTitle() == "Zażółć gęślą jaźń");
+
+    std::cout << "test_search_polish_title_case_insensitive OK\n";
+}
+
+void test_search_polish_author_case_insensitive() {
+    LibraryManager m;
+
+    m.addBook("Test", "Łukasz Żebrowski", 2020, "X");
+
+    auto r1 = m.findBooksByAuthor("łukasz");
+    auto r2 = m.findBooksByAuthor("ŁUKASZ");
+    auto r3 = m.findBooksByAuthor("żebrowski");
+    auto r4 = m.findBooksByAuthor("ŻEBROWSKI");
+
+    assert(r1.size() == 1);
+    assert(r2.size() == 1);
+    assert(r3.size() == 1);
+    assert(r4.size() == 1);
+
+    assert(r1[0].getAuthor() == "Łukasz Żebrowski");
+
+    std::cout << "test_search_polish_author_case_insensitive OK\n";
+}
 int main() {
     test_add_book();
     test_add_user();
@@ -364,6 +403,9 @@ int main() {
     test_empty_search_returns_nothing();
     test_add_user_rejects_blank_required_fields();
     test_add_book_rejects_blank_required_fields();
+
+    test_search_polish_title_case_insensitive();
+    test_search_polish_author_case_insensitive();
 
     std::cout << "\nALL TESTS PASSED\n";
     return 0;

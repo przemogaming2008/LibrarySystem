@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(Boost CONFIG REQUIRED COMPONENTS locale)
+
 add_executable(LibrarySystem
     src/main.cpp
     src/LibraryManager.cpp
@@ -14,6 +16,7 @@ add_executable(LibrarySystem
 target_include_directories(LibrarySystem PRIVATE
     ${CMAKE_SOURCE_DIR}/include
 )
+target_link_libraries(LibrarySystem PRIVATE Boost::locale)
 
 add_executable(LibrarySystemTests
     tests/test_library.cpp
@@ -23,6 +26,7 @@ add_executable(LibrarySystemTests
 target_include_directories(LibrarySystemTests PRIVATE
     ${CMAKE_SOURCE_DIR}/include
 )
+target_link_libraries(LibrarySystemTests PRIVATE Boost::locale)
 
 enable_testing()
 add_test(NAME LibrarySystemTests COMMAND LibrarySystemTests)

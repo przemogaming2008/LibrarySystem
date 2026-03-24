@@ -22,7 +22,7 @@ The project is divided into modules:
 - **DataStorage** – saving and loading data
 - **MenuUI** – console interface
 
-## 💾 Data storage
+## Data storage
 
 All data is stored in a single file (e.g. `library.txt`).
 
@@ -32,17 +32,57 @@ The file contains two sections:
 
 Each section is saved as lines with fields separated by `;`.
 
-## Case-insensitive search
-
-Case-insensitive search works correctly for standard ASCII characters.
-For Polish characters (e.g. Ż, Ł, Ś) the behavior may depend on the system and is not guaranteed.
-
 ### Config
 cmake -S . -B build
-### Build
-cmake --build build
-### Run
-build\Debug\LibrarySystem.exe
+##  Build instructions
 
-### Run tests
+This project uses CMake and vcpkg (Boost.Locale).
+
+### Windows
+
+1. Install vcpkg  
+git clone https://github.com/microsoft/vcpkg  
+cd vcpkg  
+.\bootstrap-vcpkg.bat  
+
+2. Install dependencies  
+cd LibrarySystem  
+vcpkg install  
+
+3. Build  
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=PATH_TO_VCPKG/scripts/buildsystems/vcpkg.cmake  
+cmake --build build  
+
+4. Run  
+.\build\LibrarySystem.exe  
+
+5. Tests  
 build\Debug\LibrarySystemTests.exe
+
+###  Linux
+
+1. Install vcpkg  
+git clone https://github.com/microsoft/vcpkg  
+cd vcpkg  
+./bootstrap-vcpkg.sh  
+
+2. Install dependencies  
+cd LibrarySystem  
+vcpkg install  
+
+3. Build  
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=PATH_TO_VCPKG/scripts/buildsystems/vcpkg.cmake  
+cmake --build build  
+
+4. Run  
+./build/LibrarySystem  
+
+5. Tests  
+build\Debug\LibrarySystemTests.exe 
+
+### Notes
+- Replace PATH_TO_VCPKG with your actual path (e.g. C:/dev/vcpkg)  
+- vcpkg must be installed locally (not included in the repository)  
+- Dependencies are defined in vcpkg.json 
+
+

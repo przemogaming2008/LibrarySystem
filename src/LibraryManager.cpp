@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <boost/locale.hpp>
 
 static bool isBlank(const std::string& text) {
     return text.find_first_not_of(" \t\n\r") == std::string::npos;
@@ -37,10 +38,10 @@ static bool isValidUserData(const std::string& first,
            !containsForbiddenChars(department) &&
            !containsForbiddenChars(email);
 }
-static std::string toLower(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(),
-        [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
-    return s;
+static std::string toLowerUtf8(const std::string& text) {
+    static boost::locale::generator gen;
+    static const std::locale loc = gen("");
+    return boost::locale::to_lower(text, loc);
 }
 
 static std::string getCurrentDate() {
@@ -143,10 +144,10 @@ std::vector<Book> LibraryManager::findBooksByTitle(const std::string& fragment) 
 
     std::vector<Book> result;
 
-    const std::string frag = toLower(fragment);
+    const std::string frag = toLowerUtf8(fragment);
 
     for (const auto& b : books) {
-        const std::string title = toLower(b.getTitle());
+        const std::string title = toLowerUtf8(b.getTitle());
         if (title.find(frag) != std::string::npos) {
             result.push_back(b);
         }
@@ -161,10 +162,10 @@ std::vector<Book> LibraryManager::findBooksByAuthor(const std::string& fragment)
 
     std::vector<Book> result;
 
-    const std::string frag = toLower(fragment);
+    const std::string frag = toLowerUtf8(fragment);
 
     for (const auto& b : books) {
-        const std::string author = toLower(b.getAuthor());
+        const std::string author = toLowerUtf8(b.getAuthor());
         if (author.find(frag) != std::string::npos) {
             result.push_back(b);
         }
